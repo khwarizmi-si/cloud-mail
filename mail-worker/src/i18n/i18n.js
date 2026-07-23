@@ -15,6 +15,9 @@ const resources = {
 	en: {
 		translation: en
 	},
+	id: {
+		translation: en
+	},
 	zh: {
 		translation: zh,
 	},

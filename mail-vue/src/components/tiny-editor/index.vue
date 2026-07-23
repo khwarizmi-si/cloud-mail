@@ -63,7 +63,7 @@ const language = computed(() => {
     return 'zh_CN'
   }
 
-  return 'en'
+  return locale.value === 'id' ? 'id' : 'en'
 })
 
 function clearEditor() {

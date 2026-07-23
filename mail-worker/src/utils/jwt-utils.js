@@ -34,7 +34,7 @@ const jwtUtils = {
 
 		const key = await crypto.subtle.importKey(
 			'raw',
-			encoder.encode(c.env.jwt_secret),
+			encoder.encode(c.env.jwt_secret_v2),
 			{ name: 'HMAC', hash: 'SHA-256' },
 			false,
 			['sign']
@@ -55,7 +55,7 @@ const jwtUtils = {
 			const data = `${headerB64}.${payloadB64}`;
 			const key = await crypto.subtle.importKey(
 				'raw',
-				encoder.encode(c.env.jwt_secret),
+			encoder.encode(c.env.jwt_secret_v2),
 				{ name: 'HMAC', hash: 'SHA-256' },
 				false,
 				['verify']
