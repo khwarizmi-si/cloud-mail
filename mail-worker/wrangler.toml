@@ -20,8 +20,10 @@ id = "3a7edc037d8245ef90e084995993a3c2"
 binding = "r2"
 bucket_name = "cloud-mail"
 
-[[send_email]]
-name = "email"			#CF发件, 配置后优先使用
+# Resend is configured per sending domain in System Settings.
+# Keep the Cloudflare binding disabled so Resend is selected.
+# [[send_email]]
+# name = "email"
 
 [ai]
 binding = "ai"

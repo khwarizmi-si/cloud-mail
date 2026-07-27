@@ -1,158 +1,136 @@
 <p align="center">
-    <img src="doc/demo/logo.png" width="80px" />
-    <h1 align="center">Cloud Mail</h1>
-    <p align="center">基于 Cloudflare 的简约响应式邮箱服务，支持邮件发送、附件收发 🎉</p> 
-    <p align="center">
-        简体中文 | <a href="/README-en.md" style="margin-left: 5px">English </a>
-    </p>
-    <p align="center">
-        <a href="https://github.com/maillab/cloud-mail/tree/main?tab=MIT-1-ov-file" target="_blank" >
-            <img src="https://img.shields.io/badge/license-MIT-green" />
-        </a>    
-        <a href="https://github.com/maillab/cloud-mail/releases" target="_blank" >
-            <img src="https://img.shields.io/github/v/release/maillab/cloud-mail" alt="releases" />
-        </a>  
-        <a href="https://github.com/maillab/cloud-mail/issues" >
-            <img src="https://img.shields.io/github/issues/maillab/cloud-mail" alt="issues" />
-        </a>  
-        <a href="https://github.com/maillab/cloud-mail/stargazers" target="_blank">
-            <img src="https://img.shields.io/github/stars/maillab/cloud-mail" alt="stargazers" />
-        </a>  
-        <a href="https://github.com/maillab/cloud-mail/forks" target="_blank" >
-            <img src="https://img.shields.io/github/forks/maillab/cloud-mail" alt="forks" />
-        </a>
-    </p>
-    <p align="center">
-        <a href="https://trendshift.io/repositories/20459" target="_blank" >
-            <img src="https://trendshift.io/api/badge/repositories/20459" alt="trendshift" >
-        </a>
-    </p>
+  <img src="doc/demo/logo.png" width="80" alt="Cloud Mail" />
 </p>
 
+<h1 align="center">Cloud Mail Khwarizmi</h1>
 
-## 项目简介
+<p align="center">Layanan email mandiri berbasis Cloudflare Workers untuk domain <code>khwarizmi.co.id</code>.</p>
 
-只需要一个域名，就可以创建多个不同的邮箱，类似各大邮箱平台，本项目支持署到 Cloudflare Workers ，降低服务器成本，搭建自己的邮箱服务
+<p align="center">
+  <a href="https://mail.khwarizmi.co.id">Buka Cloud Mail</a> ·
+  <a href="README-en.md">English (upstream)</a>
+</p>
 
-## 项目展示
+## Ringkasan
 
-- [在线演示](https://skymail.ink)<br>
-- [部署文档](https://doc.skymail.ink)<br>
+Cloud Mail memungkinkan pengelolaan beberapa alamat email pada satu domain, tanpa server email tradisional. Email masuk diproses melalui Cloudflare Email Routing dan Worker, sedangkan email keluar dikirim menggunakan Resend.
 
-| ![](/doc/demo/demo1.png) | ![](/doc/demo/demo2.png) |
-|-----------------------|-----------------------|
-| ![](/doc/demo/demo3.png) | ![](/doc/demo/demo4.png) |
+## Fitur
 
+- Antarmuka responsif dengan pilihan Bahasa Indonesia dan Inggris.
+- Multi-alamat email pada domain `@khwarizmi.co.id`.
+- Kirim dan terima email, termasuk lampiran serta gambar di dalam isi email.
+- Pengiriman email eksternal melalui Resend.
+- Penerusan email masuk ke Gmail/alamat eksternal yang telah diverifikasi Cloudflare.
+- Penyimpanan email di Cloudflare D1, cache di KV, dan lampiran di R2.
+- Kontrol akses berbasis peran, batas jumlah alamat email, serta batas kirim email.
+- Pengenalan kode verifikasi dengan Workers AI dan perlindungan Turnstile opsional.
 
+## Arsitektur
 
+```text
+Pengirim eksternal
+      │
+      ▼
+Cloudflare Email Routing ──► Worker ──► D1 / KV / R2 ──► Cloud Mail
+                                  │
+                                  └──► Gmail tujuan (opsional, forwarding)
 
-## 功能介绍
-
-- **💰 低成本使用**： 可部署到 Cloudflare Workers 降低服务器成本
-
-- **💻 响应式设计**：响应式布局自动适配PC和大部分手机端浏览器
-
-- **📧 邮件发送**：集成Resend发送邮件，支持群发，内嵌图片和附件发送，发送状态查看
-
-- **🛡️ 管理员功能**：可以对用户，邮件进行管理，RABC权限控制对功能及使用资源限制
-
-- **📦 附件收发**：支持收发附件，使用R2对象存储保存和下载文件
-
-- **🔔 邮件推送**：接收邮件后可以转发到TG机器人或其他服务商邮箱
-
-- **📡 开放API**：支持使用API批量生成用户，多条件查询邮件 
-
-- **🔢 验证码识别**：使用Workers AI，自动识别邮件验证码 
-
-- **📈 数据可视化**：使用ECharts对系统数据详情，用户邮件增长可视化显示
-
-- **🎨 个性化设置**：可以自定义网站标题，登录背景，透明度
-
-- **🤖 人机验证**：集成Turnstile人机验证，防止人机批量注册
-
-- **📜 更多功能**：正在开发中...
-
-
-
-## 技术栈
-
-- **平台**：[Cloudflare Workers](https://developers.cloudflare.com/workers/)
-
-- **Web框架**：[Hono](https://hono.dev/)
-
-- **ORM：**[Drizzle](https://orm.drizzle.team/)
-
-- **前端框架**：[Vue3](https://vuejs.org/) 
-
-- **UI框架**：[Element Plus](https://element-plus.org/) 
-
-- **邮件推送：** [Resend](https://resend.com/)
-
-- **缓存**：[Cloudflare KV](https://developers.cloudflare.com/kv/)
-
-- **数据库**：[Cloudflare D1](https://developers.cloudflare.com/d1/)
-
-- **文件存储**：[Cloudflare R2](https://developers.cloudflare.com/r2/)
-
-## 目录结构
-
-```
-cloud-mail
-├── mail-worker				    # worker后端项目
-│   ├── src                  
-│   │   ├── api	 			    # api接口层			
-│   │   ├── const  			    # 项目常量
-│   │   ├── dao                 # 数据访问层
-│   │   ├── email			    # 邮件处理接收
-│   │   ├── entity			    # 数据库实体
-│   │   ├── error			    # 自定义异常
-│   │   ├── hono			    # web框架配置、拦截器、全局异常等
-│   │   ├── i18n			    # 语言国际化
-│   │   ├── init			    # 数据库缓存初始化
-│   │   ├── model			    # 响应体数据封装
-│   │   ├── security			# 身份权限认证
-│   │   ├── service			    # 业务服务层
-│   │   ├── template			# 消息模板
-│   │   ├── utils			    # 工具类
-│   │   └── index.js			# 入口文件
-│   ├── pageckge.json			# 项目依赖
-│   └── wrangler.toml			# 项目配置
-│
-├── mail-vue				    # vue前端项目
-│   ├── src
-│   │   ├── axios 			    # axios配置
-│   │   ├── components			# 自定义组件
-│   │   ├── echarts			    # echarts组件导入
-│   │   ├── i18n			    # 语言国际化
-│   │   ├── init			    # 入站初始化
-│   │   ├── layout			    # 主体布局组件
-│   │   ├── perm			    # 权限认证
-│   │   ├── request			    # api接口
-│   │   ├── router			    # 路由配置
-│   │   ├── store			    # 全局状态管理
-│   │   ├── utils			    # 工具类
-│   │   ├── views			    # 页面组件
-│   │   ├── app.vue			    # 入口组件
-│   │   ├── main.js			    # 入口js
-│   │   └── style.css			# 全局css
-│   ├── package.json			# 项目依赖
-└── └── env.release				# 项目配置
+Cloud Mail ──► Resend ──► Penerima eksternal
 ```
 
-## 赞助
+## Komponen
 
-<a href="https://doc.skymail.ink/support.html" >
-<img width="170px" src="./doc/images/support.png" alt="">
-</a>
+| Komponen | Kegunaan |
+| --- | --- |
+| Cloudflare Workers + Hono | API, antarmuka, dan pemrosesan email masuk |
+| Cloudflare Email Routing | Menerima email untuk `khwarizmi.co.id` |
+| Cloudflare D1 | Data pengguna, mailbox, dan pengaturan |
+| Cloudflare KV | Cache pengaturan aplikasi |
+| Cloudflare R2 | Lampiran dan berkas email |
+| Resend | Pengiriman email eksternal |
+| Vue 3 + Element Plus | Antarmuka web |
 
-## 许可证
+## Penggunaan admin
 
-本项目采用 [MIT](LICENSE) 许可证	
+1. Buka [mail.khwarizmi.co.id](https://mail.khwarizmi.co.id) dan login sebagai admin.
+2. Tambahkan user dari menu **Semua Pengguna**.
+3. Buat role dengan prinsip akses minimum. Untuk staf umum, batasi domain ke `@khwarizmi.co.id`, maksimal satu alamat email, dan batas kirim harian sesuai kebutuhan.
+4. Tambahkan alamat mailbox dari panel kiri atau halaman pengaturan akun.
 
+### Pengiriman email eksternal dengan Resend
 
-## 交流
+1. Tambahkan dan verifikasi `khwarizmi.co.id` pada [Resend Domains](https://resend.com/domains).
+2. Buat API key dengan izin **Sending access** untuk domain tersebut.
+3. Pada Cloud Mail, buka **Pengaturan Sistem → Email → Token Resend**.
+4. Pilih `@khwarizmi.co.id`, masukkan token, lalu simpan.
 
-[Telegram](https://t.me/cloud_mail_tg)
+Jangan simpan API key pada repositori, kode sumber, atau dokumentasi.
 
+### Forward email masuk ke Gmail
 
+1. Di Cloudflare, buka **Email Routing → Destination Addresses**.
+2. Tambahkan Gmail tujuan dan selesaikan verifikasi dari email yang dikirim Cloudflare.
+3. Di Cloud Mail, buka **Pengaturan Sistem → Teruskan ke Email Eksternal**.
+4. Aktifkan forwarding, masukkan alamat Gmail yang telah diverifikasi, lalu simpan.
 
+Email akan tetap tersimpan di Cloud Mail dan salinannya diteruskan ke Gmail. Uji forwarding dari alamat pengirim yang berbeda dengan alamat Gmail tujuan untuk menghindari deteksi loop oleh penyedia email.
+
+## Pengembangan lokal
+
+### Prasyarat
+
+- Node.js 18 atau lebih baru
+- pnpm
+- Akun Cloudflare dengan D1, KV, dan R2
+- Akun Resend untuk pengiriman email eksternal
+
+### Instal dependensi
+
+```bash
+cd mail-vue && pnpm install
+cd ../mail-worker && pnpm install
+```
+
+### Jalankan aplikasi
+
+```bash
+# Terminal 1
+cd mail-vue
+pnpm dev
+
+# Terminal 2
+cd mail-worker
+pnpm dev
+```
+
+Untuk pengembangan lokal, gunakan konfigurasi dan resource Cloudflare yang terpisah dari produksi.
+
+## Deploy
+
+Konfigurasi produksi berada di [`mail-worker/wrangler.toml`](mail-worker/wrangler.toml). Pastikan ID D1, KV, R2, route, domain, dan admin sesuai akun Cloudflare tujuan.
+
+```bash
+cd mail-worker
+pnpm exec wrangler deploy
+```
+
+Perintah deploy akan membangun frontend dari `mail-vue` dan mengunggahnya sebagai aset Worker.
+
+## Struktur proyek
+
+```text
+cloud-mail/
+├── mail-worker/       # Worker, API, email handler, dan konfigurasi Cloudflare
+│   ├── src/
+│   └── wrangler.toml
+├── mail-vue/          # Antarmuka Vue
+│   ├── src/
+│   └── public/
+├── doc/               # Aset dan tangkapan layar dokumentasi
+└── README.md
+```
+
+## Lisensi dan kredit
+
+Proyek ini menggunakan lisensi [MIT](LICENSE) dan merupakan deployment turunan dari [maillab/cloud-mail](https://github.com/maillab/cloud-mail).
