@@ -33,7 +33,7 @@ const zh = {
     password: '密码',
     setForwarding: '设置转发',
     forwardingEmailDesc: '将此邮箱收到的邮件转发到一个所有者 Gmail 地址。该 Gmail 地址必须已在 Cloudflare 验证。',
-    forwardingEmailPlaceholder: 'name@gmail.com',
+    forwardingEmailPlaceholder: 'name{\'@\'}gmail.com',
     accountForwarding: '按邮箱转发',
     accountForwardingDesc: '选择邮箱地址，然后在此设置接收 Gmail 地址。',
     delAccount: '删除账户',

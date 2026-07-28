@@ -33,7 +33,7 @@ const en = {
     password: 'Password',
     setForwarding: 'Set Forwarding',
     forwardingEmailDesc: 'Forward incoming email for this address to one owner Gmail account. The Gmail address must be verified in Cloudflare.',
-    forwardingEmailPlaceholder: 'name@gmail.com',
+    forwardingEmailPlaceholder: 'name{\'@\'}gmail.com',
     accountForwarding: 'Per-address forwarding',
     accountForwardingDesc: 'Choose an email address, then set its receiving Gmail address here.',
     delAccount: 'Delete Account',
