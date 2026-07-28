@@ -2,8 +2,11 @@
   <el-scrollbar class="scroll">
     <div>
       <div class="title" >
-        <Icon icon="mdi:email-outline" width="24" height="24" />
-        <div>{{settingStore.settings.title}}</div>
+        <img class="brand-mark" src="/mail.png" alt="Khwarizmi" />
+        <div class="brand-copy">
+          <strong>{{settingStore.settings.title}}</strong>
+          <span>KHARIZMI MAIL</span>
+        </div>
       </div>
       <el-menu :collapse="false" text-color="#fff" active-text-color="#fff" style="margin-top: 10px">
         <el-menu-item @click="router.push({name: 'email'})" index="email"
@@ -83,26 +86,47 @@ const route = useRoute();
 <style lang="scss" scoped>
 
 .title {
-  margin: 15px 10px;
-  height: 45px;
-  border-radius: 6px;
+  margin: 18px 12px 22px;
+  min-height: 56px;
+  border-radius: 12px;
   display: flex;
-  position: relative;
-  font-size: 16px;
-  font-weight: bold;
+  font-size: 15px;
   align-items: center;
-  justify-content: center;
-  gap: 5px;
+  justify-content: flex-start;
+  gap: 10px;
   color: #ffffff;
-  background: linear-gradient(135deg, #1890ff, #3a80dd);
-  transition: all 0.3s ease;
+  background: #0d625d;
+  border: 1px solid rgba(255, 255, 255, 0.12);
   max-width: 240px;
-  padding: 0 10px;
-  > div {
+  padding: 8px 12px;
+
+  .brand-mark {
+    width: 34px;
+    height: 34px;
+    object-fit: contain;
+    flex: 0 0 auto;
+  }
+
+  .brand-copy {
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-    max-width: calc(240px - 20px - 30px);
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 1px;
+
+    strong {
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    span {
+      color: #bce1dd;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+    }
   }
 
   :deep(.el-icon) {
@@ -122,27 +146,35 @@ const route = useRoute();
 
 
 .manage-title {
-  margin-top: 10px;
-  padding-left: 20px;
-  color: #fff;
+  margin: 20px 0 7px;
+  padding-left: 22px;
+  color: #a6ceca;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .el-menu-item {
-  margin: 5px 10px !important;
-  border-radius: 6px;
-  height: 36px;
+  margin: 4px 10px !important;
+  border-radius: 8px;
+  height: 40px;
   padding: 10px !important;
 }
 
 .choose-item {
   font-weight: bold;
-  background: rgba(255, 255, 255, 0.08) !important;
-  backdrop-filter: blur(4px);
+  color: #ffffff !important;
+  background: #0d625d !important;
+
+  :deep(svg) {
+    color: var(--khwarizmi-orange);
+  }
 }
 
 @media (hover: hover) {
   .el-menu-item:hover {
-    background: rgba(255, 255, 255, 0.08) !important;
+    background: rgba(255, 255, 255, 0.09) !important;
   }
 }
 
@@ -157,6 +189,7 @@ const route = useRoute();
 
 :deep(.el-menu-item) {
   background: var(--aside-backgound);
+  transition: background-color 180ms ease, color 180ms ease;
 }
 
 :deep(.el-menu) {

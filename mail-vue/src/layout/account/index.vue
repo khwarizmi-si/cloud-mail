@@ -25,6 +25,7 @@
                 <template #dropdown>
                   <el-dropdown-menu>
                     <el-dropdown-item v-if="hasPerm('email:send')" @click="openSetName(item)">{{ $t('rename') }}</el-dropdown-item>
+                    <el-dropdown-item @click="openSetForwardEmail(item)">{{ $t('setForwarding') }}</el-dropdown-item>
                     <el-dropdown-item v-if="item.accountId !== userStore.user.account.accountId" @click="setAsTop(item, index)">{{ $t('pin') }}</el-dropdown-item>
                     <el-dropdown-item v-if="item.accountId !== userStore.user.account.accountId && hasPerm('account:delete')"
                                       @click="remove(item)">{{ $t('delete') }}
@@ -123,6 +124,13 @@
         </el-button>
       </div>
     </el-dialog>
+    <el-dialog v-model="forwardEmailShow" :title="$t('setForwarding')">
+      <div class="container">
+        <p class="forward-description">{{ $t('forwardingEmailDesc') }}</p>
+        <el-input v-model="forwardEmail" :placeholder="$t('forwardingEmailPlaceholder')" autocomplete="email" />
+        <el-button class="btn" type="primary" @click="setForwardEmail" :loading="forwardEmailLoading">{{ $t('save') }}</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 <script setup>
@@ -133,6 +141,7 @@ import {
   accountAdd,
   accountDelete,
   accountSetName,
+  accountSetForwardEmail,
   accountSetAllReceive,
   accountSetAsTop
 } from "@/request/account.js";
@@ -162,6 +171,9 @@ const verifyShow = ref(false)
 const setNameShow = ref(false)
 const setNameLoading = ref(false)
 const accountName = ref(null)
+const forwardEmailShow = ref(false)
+const forwardEmailLoading = ref(false)
+const forwardEmail = ref('')
 const addRef = ref({})
 const scrollbarRef = ref({})
 let account = null
@@ -268,6 +280,29 @@ function openSetName(accountItem) {
   accountName.value = accountItem.name
   account = accountItem
   setNameShow.value = true
+}
+
+function openSetForwardEmail(accountItem) {
+  account = accountItem
+  forwardEmail.value = account.forwardEmail || ''
+  forwardEmailShow.value = true
+}
+
+function setForwardEmail() {
+  const email = forwardEmail.value.trim().toLowerCase()
+  if (email && !isEmail(email)) {
+    ElMessage({message: t('notEmailMsg'), type: 'error', plain: true})
+    return
+  }
+
+  forwardEmailLoading.value = true
+  accountSetForwardEmail(account.accountId, email).then(() => {
+    account.forwardEmail = email
+    forwardEmailShow.value = false
+    ElMessage({message: t('saveSuccessMsg'), type: 'success', plain: true})
+  }).finally(() => {
+    forwardEmailLoading.value = false
+  })
 }
 
 function setAllReceive(account) {
@@ -575,6 +610,13 @@ path[fill="#ffdda1"] {
   .btn {
     width: 100%;
     margin-top: 15px;
+  }
+
+  .forward-description {
+    margin: 0 0 12px;
+    color: var(--el-text-color-secondary);
+    font-size: 13px;
+    line-height: 1.5;
   }
 
   .item {

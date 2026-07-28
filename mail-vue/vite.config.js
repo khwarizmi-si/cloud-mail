@@ -21,8 +21,9 @@ export default defineConfig(({mode}) => {
                 manifest: {
                     name: env.VITE_PWA_NAME,
                     short_name: env.VITE_PWA_NAME,
-                    background_color: '#FFFFFF',
-                    theme_color: '#FFFFFF',
+                    lang: 'id',
+                    background_color: '#f7fbfa',
+                    theme_color: '#0f766e',
                     icons: [
                         {
                             src: 'mail-pwa.png',

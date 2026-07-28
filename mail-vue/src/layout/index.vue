@@ -91,7 +91,7 @@ onBeforeUnmount(() => {
 
 .main-container {
   min-height: 100%;
-  background: var(--el-bg-color);
+  background: var(--extra-light-fill);
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 }
@@ -101,9 +101,9 @@ onBeforeUnmount(() => {
 }
 
 .el-header {
-  background: var(--el-bg-color);
-  border-bottom: solid 1px var(--el-border-color);
-  padding: 0 0 0 0;
+  background: color-mix(in srgb, var(--el-bg-color) 94%, var(--el-color-primary-light-9));
+  border-bottom: solid 1px var(--light-border);
+  padding: 0 18px;
 }
 
 .overlay-show {

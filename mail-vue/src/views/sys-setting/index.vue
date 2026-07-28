@@ -258,21 +258,9 @@
                 </div>
               </div>
               <div class="setting-item">
-                <div><span>{{ $t('otherEmail') }}</span></div>
-                <div class="forward">
-                  <span>{{ setting.forwardStatus === 0 ? $t('enabled') : $t('disabled') }}</span>
-                  <el-button class="opt-button" size="small" type="primary" @click="openThirdEmailSetting">
-                    <Icon icon="fluent:settings-48-regular" width="18" height="18"/>
-                  </el-button>
-                </div>
-              </div>
-              <div class="setting-item">
-                <div><span>{{ $t('forwardingRules') }}</span></div>
-                <div class="forward">
-                  <span>{{ setting.ruleType === 0 ? $t('forwardAll') : $t('rules') }}</span>
-                  <el-button class="opt-button" size="small" type="primary" @click="openForwardRules">
-                    <Icon icon="fluent:settings-48-regular" width="18" height="18"/>
-                  </el-button>
+                <div>
+                  <span>{{ $t('accountForwarding') }}</span>
+                  <p class="setting-description">{{ $t('accountForwardingDesc') }}</p>
                 </div>
               </div>
             </div>
@@ -572,60 +560,6 @@
           </div>
         </template>
       </el-dialog>
-      <el-dialog
-          v-model="thirdEmailShow"
-          class="forward-dialog"
-      >
-        <template #header>
-          <div class="forward-head">
-            <span class="forward-set-title">{{ $t('otherEmail') }}</span>
-            <el-tooltip effect="dark" :content="$t('otherEmailDesc')">
-              <Icon class="warning" icon="fe:warning" width="18" height="18"/>
-            </el-tooltip>
-          </div>
-        </template>
-        <div class="forward-set-body">
-          <el-input-tag tag-type="warning" :placeholder="$t('otherEmailInputDesc')" v-model="forwardEmail"
-                        @add-tag="emailAddTag"></el-input-tag>
-        </div>
-        <template #footer>
-          <div class="dialog-footer">
-            <el-switch v-model="forwardStatus" :active-value="0" :inactive-value="1" :active-text="$t('enable')"
-                       :inactive-text="$t('disable')"/>
-            <el-button :loading="settingLoading" type="primary" @click="forwardEmailSave">
-              {{ $t('save') }}
-            </el-button>
-          </div>
-        </template>
-      </el-dialog>
-      <el-dialog
-          v-model="forwardRulesShow"
-          class="forward-dialog"
-      >
-        <template #header>
-          <div class="forward-head">
-            <span class="forward-set-title">{{ $t('forwardingRules') }}</span>
-            <el-tooltip effect="dark" :content="$t('forwardingRulesDesc')">
-              <Icon class="warning" icon="fe:warning" width="18" height="18"/>
-            </el-tooltip>
-          </div>
-        </template>
-        <div class="forward-set-body">
-          <el-input-tag :placeholder="$t('ruleEmailsInputDesc')" tag-type="success" v-model="ruleEmail"
-                        @add-tag="ruleEmailAddTag"/>
-        </div>
-        <template #footer>
-          <div class="dialog-footer">
-            <el-radio-group v-model="ruleType">
-              <el-radio :value="0">{{ $t('forwardAll') }}</el-radio>
-              <el-radio :value="1">{{ $t('rules') }}</el-radio>
-            </el-radio-group>
-            <el-button :loading="settingLoading" type="primary" @click="ruleEmailSave">
-              {{ $t('save') }}
-            </el-button>
-          </div>
-        </template>
-      </el-dialog>
       <el-dialog class="resend-table" v-model="showResendList" :title="$t('resendTokenList')">
         <el-table :data="resendList">
           <el-table-column :min-width="emailColumnWidth" property="key" :label="$t('domain')"
@@ -843,8 +777,6 @@ const r2DomainShow = ref(false)
 const turnstileShow = ref(false)
 const tgSettingShow = ref(false)
 const noticePopupShow = ref(false)
-const thirdEmailShow = ref(false)
-const forwardRulesShow = ref(false)
 const emailPrefixShow = ref(false)
 const showResendList = ref(false)
 const settingStore = useSettingStore();
@@ -921,12 +853,8 @@ const tgChatId = ref([])
 const customDomain = ref('')
 const tgBotStatus = ref(0)
 const tgBotToken = ref('')
-const forwardEmail = ref([])
-const forwardStatus = ref(0)
 const emailColumnWidth = ref(0)
 const tokenColumnWidth = ref(0)
-const ruleType = ref(0)
-const ruleEmail = ref([])
 const tgMsgFrom = ref('')
 const tgMsgTo = ref('')
 const tgMsgText = ref('')
@@ -1098,56 +1026,8 @@ function previewNoticePopup() {
   uiStore.previewNotice({...noticeForm})
 }
 
-function openThirdEmailSetting() {
-  forwardEmail.value = []
-  forwardStatus.value = setting.value.forwardStatus
-  if (setting.value.forwardEmail) {
-    const list = setting.value.forwardEmail.split(',')
-    forwardEmail.value.push(...list)
-  }
-  thirdEmailShow.value = true
-}
-
 function openEmailPrefix() {
   emailPrefixShow.value = true
-}
-
-function openForwardRules() {
-  ruleType.value = setting.value.ruleType
-  ruleEmail.value = []
-  if (setting.value.ruleEmail) {
-    const list = setting.value.ruleEmail.split(',')
-    ruleEmail.value.push(...list)
-  }
-  forwardRulesShow.value = true
-}
-
-function emailAddTag(val) {
-  const emails = Array.from(new Set(
-      val.split(/[,，]/).map(item => item.trim()).filter(item => item)
-  ));
-
-  forwardEmail.value.splice(forwardEmail.value.length - 1, 1)
-
-  emails.forEach(email => {
-    if (isEmail(email) && !forwardEmail.value.includes(email)) {
-      forwardEmail.value.push(email)
-    }
-  })
-}
-
-function ruleEmailAddTag(val) {
-  const emails = Array.from(new Set(
-      val.split(/[,，]/).map(item => item.trim()).filter(item => item)
-  ));
-
-  ruleEmail.value.splice(ruleEmail.value.length - 1, 1)
-
-  emails.forEach(email => {
-    if (isEmail(email) && !ruleEmail.value.includes(email)) {
-      ruleEmail.value.push(email)
-    }
-  })
 }
 
 function addChatTag(val) {
@@ -1204,23 +1084,6 @@ function tgBotSave() {
     tgMsgTo: tgMsgTo.value
   }
   if (tgBotToken.value) form.tgBotToken = tgBotToken.value
-  editSetting(form)
-}
-
-function forwardEmailSave() {
-  const form = {
-    forwardStatus: forwardStatus.value,
-    forwardEmail: forwardEmail.value + ''
-  }
-  editSetting(form)
-}
-
-
-function ruleEmailSave() {
-  const form = {
-    ruleEmail: ruleEmail.value + '',
-    ruleType: ruleType.value
-  }
   editSetting(form)
 }
 
@@ -1485,8 +1348,6 @@ function editSetting(settingForm, refreshStatus = true) {
     resendTokenFormShow.value = false
     turnstileShow.value = false
     tgSettingShow.value = false
-    thirdEmailShow.value = false
-    forwardRulesShow.value = false
     addVerifyCountShow.value = false
     regVerifyCountShow.value = false
     noticePopupShow.value = false
@@ -1588,18 +1449,24 @@ function editSetting(settingForm, refreshStatus = true) {
 
 .settings-card {
   background-color: var(--el-bg-color);
-  border-radius: 8px;
-  border: 1px solid var(--el-border-color);
-  transition: all 300ms;
+  border-radius: 12px;
+  border: 1px solid var(--light-border);
+  transition: border-color 180ms ease, transform 180ms ease;
   overflow: hidden;
+
+  &:hover {
+    border-color: var(--el-color-primary-light-7);
+  }
 }
 
 
 .card-title {
   font-size: 15px;
-  font-weight: bold;
-  padding: 10px 20px;
-  border-bottom: 1px solid var(--el-border-color);
+  font-weight: 700;
+  color: var(--khwarizmi-teal-800);
+  padding: 13px 20px;
+  background: var(--el-color-primary-light-9);
+  border-bottom: 1px solid var(--light-border);
 }
 
 .card-content {
@@ -1846,6 +1713,12 @@ function editSetting(settingForm, refreshStatus = true) {
 
 .opt-button {
   width: fit-content !important;
+}
+
+.setting-description {
+  margin: 5px 0 0;
+  color: var(--el-text-color-secondary);
+  font-size: 13px;
 }
 
 .email-prefix {

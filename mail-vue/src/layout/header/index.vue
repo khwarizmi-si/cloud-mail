@@ -378,10 +378,10 @@ function formatName(email) {
   .writer {
     width: 34px;
     height: 34px;
-    border-radius: 50%;
+    border-radius: 10px;
     color: #ffffff;
-    background: linear-gradient(135deg, #1890ff, #3a80dd);
-    transition: all 0.3s ease;
+    background: var(--khwarizmi-orange);
+    transition: background-color 180ms ease, transform 180ms ease;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -391,6 +391,11 @@ function formatName(email) {
       font-size: 14px;
       font-weight: bold;;
     }
+  }
+
+  &:hover .writer {
+    background: var(--khwarizmi-orange-dark);
+    transform: translateY(-1px);
   }
 }
 
@@ -404,7 +409,7 @@ function formatName(email) {
 .breadcrumb-item {
   font-weight: bold;
   font-size: 14px;
-  color: var(--el-text-color-primary);
+  color: var(--khwarizmi-teal-950);
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -422,7 +427,7 @@ function formatName(email) {
     align-self: center;
     width: 30px;
     height: 30px;
-    border-radius: 4px;
+    border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -430,7 +435,7 @@ function formatName(email) {
   }
 
   .icon-item:hover {
-    background: var(--base-fill);
+    background: var(--el-color-primary-light-9);
   }
 
   .notice {
@@ -452,15 +457,15 @@ function formatName(email) {
     cursor: pointer;
 
     .avatar-text {
-      background: var(--el-bg-color);
-      color: var(--el-text-color-primary);
+      background: var(--el-color-primary-light-9);
+      color: var(--khwarizmi-teal-800);
       height: 30px;
       width: 30px;
       display: flex;
       justify-content: center;
       align-items: center;
-      border-radius: 8px;
-      border: 1px solid var(--dark-border);
+      border-radius: 10px;
+      border: 1px solid var(--el-color-primary-light-7);
     }
 
     .setting-icon {

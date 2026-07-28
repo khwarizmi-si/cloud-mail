@@ -20,10 +20,7 @@ export async function email(message, env, ctx) {
 			receive,
 			tgChatId,
 			tgBotStatus,
-			forwardStatus,
-			forwardEmail,
-			ruleEmail,
-			ruleType,
+			resendTokens,
 			r2Domain,
 			noRecipient,
 			blackSubject,
@@ -147,42 +144,41 @@ export async function email(message, env, ctx) {
 		emailRow = await emailService.completeReceive({ env }, account ? emailConst.status.RECEIVE : emailConst.status.NOONE, emailRow.emailId);
 
 
-		if (ruleType === settingConst.ruleType.RULE) {
-
-			const emails = ruleEmail.split(',');
-
-			if (!emails.includes(message.to)) {
-				return;
-			}
-
-		}
-
 		//转发到TG
 		if (tgBotStatus === settingConst.tgBotStatus.OPEN && tgChatId) {
 			await telegramService.sendEmailToBot({ env }, emailRow)
 		}
 
-		//转发到其他邮箱
-		if (forwardStatus === settingConst.forwardStatus.OPEN && forwardEmail) {
-
-			const emails = forwardEmail.split(',');
-
-			await Promise.all(emails.map(async email => {
-
-				try {
-					await message.forward(email);
-				} catch (e) {
-					console.error(`转发邮箱 ${email} 失败：`, e);
-				}
-
-			}));
-
+		if (account?.forwardEmail) {
+			try {
+				await message.forward(account.forwardEmail);
+				await sendInboxLink({ env }, resendTokens, message.to, account.forwardEmail);
+			} catch (e) {
+				console.error(`转发邮箱 ${account.forwardEmail} 失败：`, e);
+			}
 		}
 
 	} catch (e) {
 		console.error('邮件接收异常: ', e);
 		throw e
 	}
+}
+
+async function sendInboxLink(c, resendTokens, accountEmail, forwardEmail) {
+	const domain = emailUtils.getDomain(accountEmail);
+	const resendToken = resendTokens?.[domain];
+	if (!resendToken) return;
+
+	const inboxUrl = 'https://mail.khwarizmi.co.id/inbox';
+	await emailService.sendByResend(resendToken, {
+		accountEmail: `noreply@${domain}`,
+		name: 'Khwarizmi Mail',
+		receiveEmail: [forwardEmail],
+		subject: 'Email baru di Khwarizmi Mail',
+		text: `Email asli sudah diteruskan. Buka kotak masuk: ${inboxUrl}`,
+		html: `<p>Email asli sudah diteruskan ke alamat ini.</p><p><a href="${inboxUrl}">Buka Kotak Masuk Khwarizmi Mail</a></p>`,
+		attachments: []
+	});
 }
 
 function checkBlock(blackSubjectStr, blackContentStr, blackFromStr, email) {

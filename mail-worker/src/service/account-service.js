@@ -217,6 +217,22 @@ const accountService = {
 		await orm(c).update(account).set({name}).where(and(eq(account.userId, userId),eq(account.accountId, accountId))).run();
 	},
 
+	async setForwardEmail(c, params, userId) {
+		const accountId = Number(params.accountId);
+		const forwardEmail = (params.forwardEmail || '').trim().toLowerCase();
+		const accountRow = await this.selectById(c, accountId);
+
+		if (!accountRow || accountRow.userId !== userId) {
+			throw new BizError(t('noUserAccount'), 403);
+		}
+
+		if (forwardEmail && !verifyUtils.isEmail(forwardEmail)) {
+			throw new BizError(t('notEmail'));
+		}
+
+		await orm(c).update(account).set({ forwardEmail }).where(eq(account.accountId, accountId)).run();
+	},
+
 	async allAccount(c, params) {
 
 		let { userId, num, size } = params
