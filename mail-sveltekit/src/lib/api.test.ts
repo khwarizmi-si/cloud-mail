@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ApiError, unwrapResult } from './api';
+import { ApiError, query, unwrapResult } from './api';
 
 describe('unwrapResult', () => {
 	it('returns data from a successful Worker response', () => {
@@ -16,5 +16,9 @@ describe('unwrapResult', () => {
 		} catch (error) {
 			expect(error).toMatchObject({ code: 401, message: 'Sesi berakhir' });
 		}
+	});
+
+	it('serializes only defined query values', () => {
+		expect(query('/email/list', { accountId: 1, empty: undefined })).toBe('/email/list?accountId=1');
 	});
 });

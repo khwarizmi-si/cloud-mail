@@ -47,5 +47,38 @@ export async function api<T>(path: string, init: RequestInit = {}): Promise<T> {
 	return unwrapResult<T>((await response.json()) as WorkerResult<T>);
 }
 
+export function query(path: string, params: Record<string, string | number | boolean | undefined>) {
+	const search = new URLSearchParams();
+	for (const [key, value] of Object.entries(params)) {
+		if (value !== undefined) search.set(key, String(value));
+	}
+	return `${path}?${search}`;
+}
+
+export type Account = { accountId: number; email: string; allReceive: number; forwardEmail?: string };
+export type Mail = {
+	emailId: number;
+	name?: string;
+	sendEmail?: string;
+	subject?: string;
+	text?: string;
+	createTime?: string;
+	unread?: number;
+};
+
+export type MailList = { list: Mail[]; total: number; latestEmail: Mail };
+
 export const login = (email: string, password: string) =>
 	api<{ token: string }>('/login', { method: 'POST', body: JSON.stringify({ email, password }) });
+
+export const listAccounts = () => api<Account[]>(query('/account/list', { accountId: 0, size: 50 }));
+
+export const listInbox = (account: Account) =>
+	api<MailList>(query('/email/list', {
+		accountId: account.accountId,
+		allReceive: account.allReceive,
+		emailId: 0,
+		timeSort: 0,
+		size: 50,
+		type: 0
+	}));
