@@ -30,6 +30,15 @@
         </div>
       </div>
     </div>
+    <div class="forwarding">
+      <div class="title">{{$t('accountForwarding')}}</div>
+      <div class="forwarding-description">{{$t('accountForwardingDesc')}}</div>
+      <el-select v-model="forwardAccountId" @change="selectForwardAccount">
+        <el-option v-for="item in accounts" :key="item.accountId" :label="item.email" :value="item.accountId" />
+      </el-select>
+      <el-input v-model="forwardEmail" type="email" :placeholder="$t('forwardingEmailPlaceholder')" autocomplete="email" />
+      <el-button type="primary" :loading="forwardEmailLoading" @click="saveForwardEmail">{{$t('save')}}</el-button>
+    </div>
     <div class="language">
       <div class="title">{{$t('language')}}</div>
       <el-select
@@ -62,14 +71,15 @@
   </div>
 </template>
 <script setup>
-import {reactive, ref, defineOptions} from 'vue'
+import {onMounted, reactive, ref, defineOptions} from 'vue'
 import {resetPassword, userDelete} from "@/request/my.js";
 import {useUserStore} from "@/store/user.js";
 import router from "@/router/index.js";
-import {accountSetName} from "@/request/account.js";
+import {accountList, accountSetForwardEmail, accountSetName} from "@/request/account.js";
 import {useAccountStore} from "@/store/account.js";
 import {useI18n} from "vue-i18n";
 import {useSettingStore} from "@/store/setting.js";
+import {isEmail} from "@/utils/verify-utils.js";
 
 const { t } = useI18n()
 const accountStore = useAccountStore()
@@ -79,10 +89,42 @@ const setPwdLoading = ref(false)
 const setNameShow = ref(false)
 const accountName = ref(null)
 const langSelect = ref(settingStore.lang)
+const accounts = ref([])
+const forwardAccountId = ref(userStore.user.account.accountId)
+const forwardEmail = ref('')
+const forwardEmailLoading = ref(false)
 
 defineOptions({
   name: 'setting'
 })
+
+onMounted(async () => {
+  accounts.value = await accountList(0, 50, null)
+  selectForwardAccount(forwardAccountId.value)
+})
+
+function selectForwardAccount(accountId) {
+  const selectedAccount = accounts.value.find(item => item.accountId === accountId)
+  forwardEmail.value = selectedAccount?.forwardEmail || ''
+}
+
+function saveForwardEmail() {
+  const email = forwardEmail.value.trim().toLowerCase()
+  const accountId = forwardAccountId.value
+  if (email && !isEmail(email)) {
+    ElMessage({message: t('notEmailMsg'), type: 'error', plain: true})
+    return
+  }
+
+  forwardEmailLoading.value = true
+  accountSetForwardEmail(accountId, email).then(() => {
+    const selectedAccount = accounts.value.find(item => item.accountId === accountId)
+    selectedAccount.forwardEmail = email
+    ElMessage({message: t('saveSuccessMsg'), type: 'success', plain: true})
+  }).finally(() => {
+    forwardEmailLoading.value = false
+  })
+}
 
 function showSetName() {
   accountName.value = userStore.user.name
@@ -284,6 +326,20 @@ function submitPwd() {
 
     .language-select {
       width: 100px;
+    }
+  }
+
+  .forwarding {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-width: 420px;
+    margin-bottom: 40px;
+
+    .forwarding-description {
+      color: var(--regular-text-color);
+      font-size: 14px;
+      line-height: 1.5;
     }
   }
 

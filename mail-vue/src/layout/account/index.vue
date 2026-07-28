@@ -4,15 +4,6 @@
       <Icon v-perm="'account:add'" class="icon add" icon="ion:add-outline" width="23" height="23" @click="add"/>
       <Icon class="icon refresh" icon="ion:reload" width="18" height="18" @click="refresh"/>
     </div>
-    <div v-if="forwardAccount" class="forward-panel">
-      <div class="forward-panel-title">{{ $t('setForwarding') }}</div>
-      <div class="forward-panel-account">{{ forwardAccount.email }}</div>
-      <el-input v-model="forwardEmail" type="email" :placeholder="$t('forwardingEmailPlaceholder')" autocomplete="email" />
-      <div class="forward-actions">
-        <el-button size="small" type="primary" :loading="forwardEmailLoading" @click="saveForwardEmail">{{ $t('save') }}</el-button>
-        <el-button size="small" text @click="cancelForwardEmail">{{ $t('cancel') }}</el-button>
-      </div>
-    </div>
     <el-scrollbar class="scrollbar" ref="scrollbarRef">
       <div v-infinite-scroll="getAccountList" :infinite-scroll-distance="600" :infinite-scroll-immediate="false">
         <el-card class="item" :class="itemBg(item.accountId)" v-for="(item, index) in accounts" :key="item.accountId"
@@ -34,7 +25,6 @@
                 <template #dropdown>
                   <el-dropdown-menu>
                     <el-dropdown-item v-if="hasPerm('email:send')" @click="openSetName(item)">{{ $t('rename') }}</el-dropdown-item>
-                    <el-dropdown-item @click="openSetForwardEmail(item)">{{ $t('setForwarding') }}</el-dropdown-item>
                     <el-dropdown-item v-if="item.accountId !== userStore.user.account.accountId" @click="setAsTop(item, index)">{{ $t('pin') }}</el-dropdown-item>
                     <el-dropdown-item v-if="item.accountId !== userStore.user.account.accountId && hasPerm('account:delete')"
                                       @click="remove(item)">{{ $t('delete') }}
@@ -143,7 +133,6 @@ import {
   accountAdd,
   accountDelete,
   accountSetName,
-  accountSetForwardEmail,
   accountSetAllReceive,
   accountSetAsTop
 } from "@/request/account.js";
@@ -173,9 +162,6 @@ const verifyShow = ref(false)
 const setNameShow = ref(false)
 const setNameLoading = ref(false)
 const accountName = ref(null)
-const forwardAccount = ref(null)
-const forwardEmailLoading = ref(false)
-const forwardEmail = ref('')
 const addRef = ref({})
 const scrollbarRef = ref({})
 let account = null
@@ -282,34 +268,6 @@ function openSetName(accountItem) {
   accountName.value = accountItem.name
   account = accountItem
   setNameShow.value = true
-}
-
-function openSetForwardEmail(accountItem) {
-  forwardAccount.value = accountItem
-  forwardEmail.value = accountItem.forwardEmail || ''
-}
-
-function cancelForwardEmail() {
-  forwardAccount.value = null
-  forwardEmail.value = ''
-}
-
-function saveForwardEmail() {
-  const email = forwardEmail.value.trim().toLowerCase()
-  const selectedAccount = forwardAccount.value
-  if (email && !isEmail(email)) {
-    ElMessage({message: t('notEmailMsg'), type: 'error', plain: true})
-    return
-  }
-
-  forwardEmailLoading.value = true
-  accountSetForwardEmail(selectedAccount.accountId, email).then(() => {
-    selectedAccount.forwardEmail = email
-    cancelForwardEmail()
-    ElMessage({message: t('saveSuccessMsg'), type: 'success', plain: true})
-  }).finally(() => {
-    forwardEmailLoading.value = false
-  })
 }
 
 function setAllReceive(account) {
@@ -611,34 +569,6 @@ path[fill="#ffdda1"] {
       align-items: center;
       padding: 10px 0;
       color: var(--secondary-text-color);
-    }
-  }
-
-  .forward-panel {
-    display: grid;
-    gap: 8px;
-    margin: 10px;
-    padding: 12px;
-    border: 1px solid var(--el-border-color);
-    border-radius: 8px;
-    background: var(--el-bg-color);
-
-    .forward-panel-title {
-      font-weight: 600;
-    }
-
-    .forward-panel-account {
-      overflow: hidden;
-      color: var(--el-text-color-secondary);
-      font-size: 12px;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .forward-actions {
-      display: flex;
-      justify-content: flex-end;
-      gap: 4px;
     }
   }
 

@@ -35,7 +35,7 @@ const zh = {
     forwardingEmailDesc: '将此邮箱收到的邮件转发到一个所有者 Gmail 地址。该 Gmail 地址必须已在 Cloudflare 验证。',
     forwardingEmailPlaceholder: 'name@gmail.com',
     accountForwarding: '按邮箱转发',
-    accountForwardingDesc: '在左侧面板每个邮箱地址的菜单中设置接收 Gmail 地址。',
+    accountForwardingDesc: '选择邮箱地址，然后在此设置接收 Gmail 地址。',
     delAccount: '删除账户',
     delAccountMsg: '此操作将永久删除您的账户及其所有数据，无法恢复',
     totalReceived: '收件数量',
