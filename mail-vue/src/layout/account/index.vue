@@ -35,6 +35,14 @@
               </el-dropdown>
             </div>
           </div>
+          <div v-if="forwardAccountId === item.accountId" class="forward-inline" @click.stop>
+            <span>{{ $t('forwardingEmailPlaceholder') }}</span>
+            <el-input v-model="forwardEmail" type="email" :placeholder="$t('forwardingEmailPlaceholder')" autocomplete="email" />
+            <div class="forward-actions">
+              <el-button size="small" type="primary" :loading="forwardEmailLoading" @click="saveForwardEmail(item)">{{ $t('save') }}</el-button>
+              <el-button size="small" text @click="cancelForwardEmail">{{ $t('cancel') }}</el-button>
+            </div>
+          </div>
         </el-card>
 
         <!-- Initial Loading Skeleton -->
@@ -76,7 +84,7 @@
       </div>
 
     </el-scrollbar>
-    <el-dialog v-model="showAdd" :title="$t('addAccount')">
+    <el-dialog v-model="showAdd" :title="$t('addAccount')" append-to-body>
       <div class="container">
         <el-input v-model="addForm.email" ref="addRef" type="text" :placeholder="$t('emailAccount')" autocomplete="off">
           <template #append>
@@ -115,20 +123,13 @@
         <span style="font-size: 12px;color: #F56C6C" v-if="botJsError">{{ $t('verifyModuleFailed') }}</span>
       </div>
     </el-dialog>
-    <el-dialog v-model="setNameShow" :title="$t('changeUserName')">
+    <el-dialog v-model="setNameShow" :title="$t('changeUserName')" append-to-body>
       <div class="container">
         <el-input v-model="accountName" type="text" :placeholder="$t('username')" autocomplete="off">
         </el-input>
         <el-button class="btn" type="primary" @click="setName" :loading="setNameLoading"
         >{{ $t('save') }}
         </el-button>
-      </div>
-    </el-dialog>
-    <el-dialog v-model="forwardEmailShow" :title="$t('setForwarding')">
-      <div class="container">
-        <p class="forward-description">{{ $t('forwardingEmailDesc') }}</p>
-        <el-input v-model="forwardEmail" :placeholder="$t('forwardingEmailPlaceholder')" autocomplete="email" />
-        <el-button class="btn" type="primary" @click="setForwardEmail" :loading="forwardEmailLoading">{{ $t('save') }}</el-button>
       </div>
     </el-dialog>
   </div>
@@ -171,7 +172,7 @@ const verifyShow = ref(false)
 const setNameShow = ref(false)
 const setNameLoading = ref(false)
 const accountName = ref(null)
-const forwardEmailShow = ref(false)
+const forwardAccountId = ref(null)
 const forwardEmailLoading = ref(false)
 const forwardEmail = ref('')
 const addRef = ref({})
@@ -283,12 +284,16 @@ function openSetName(accountItem) {
 }
 
 function openSetForwardEmail(accountItem) {
-  account = accountItem
-  forwardEmail.value = account.forwardEmail || ''
-  forwardEmailShow.value = true
+  forwardAccountId.value = accountItem.accountId
+  forwardEmail.value = accountItem.forwardEmail || ''
 }
 
-function setForwardEmail() {
+function cancelForwardEmail() {
+  forwardAccountId.value = null
+  forwardEmail.value = ''
+}
+
+function saveForwardEmail(accountItem) {
   const email = forwardEmail.value.trim().toLowerCase()
   if (email && !isEmail(email)) {
     ElMessage({message: t('notEmailMsg'), type: 'error', plain: true})
@@ -296,9 +301,9 @@ function setForwardEmail() {
   }
 
   forwardEmailLoading.value = true
-  accountSetForwardEmail(account.accountId, email).then(() => {
-    account.forwardEmail = email
-    forwardEmailShow.value = false
+  accountSetForwardEmail(accountItem.accountId, email).then(() => {
+    accountItem.forwardEmail = email
+    cancelForwardEmail()
     ElMessage({message: t('saveSuccessMsg'), type: 'success', plain: true})
   }).finally(() => {
     forwardEmailLoading.value = false
@@ -612,13 +617,6 @@ path[fill="#ffdda1"] {
     margin-top: 15px;
   }
 
-  .forward-description {
-    margin: 0 0 12px;
-    color: var(--el-text-color-secondary);
-    font-size: 13px;
-    line-height: 1.5;
-  }
-
   .item {
     background-color: var(--el-bg-color);
     border-radius: 8px;
@@ -651,6 +649,25 @@ path[fill="#ffdda1"] {
       .send-email {
         display: flex;
         align-items: center;
+      }
+    }
+
+    .forward-inline {
+      display: grid;
+      gap: 8px;
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px solid var(--el-border-color-lighter);
+
+      > span {
+        color: var(--el-text-color-secondary);
+        font-size: 12px;
+      }
+
+      .forward-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 4px;
       }
     }
 
