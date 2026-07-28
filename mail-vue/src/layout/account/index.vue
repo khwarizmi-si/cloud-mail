@@ -4,6 +4,15 @@
       <Icon v-perm="'account:add'" class="icon add" icon="ion:add-outline" width="23" height="23" @click="add"/>
       <Icon class="icon refresh" icon="ion:reload" width="18" height="18" @click="refresh"/>
     </div>
+    <div v-if="forwardAccount" class="forward-panel">
+      <div class="forward-panel-title">{{ $t('setForwarding') }}</div>
+      <div class="forward-panel-account">{{ forwardAccount.email }}</div>
+      <el-input v-model="forwardEmail" type="email" :placeholder="$t('forwardingEmailPlaceholder')" autocomplete="email" />
+      <div class="forward-actions">
+        <el-button size="small" type="primary" :loading="forwardEmailLoading" @click="saveForwardEmail">{{ $t('save') }}</el-button>
+        <el-button size="small" text @click="cancelForwardEmail">{{ $t('cancel') }}</el-button>
+      </div>
+    </div>
     <el-scrollbar class="scrollbar" ref="scrollbarRef">
       <div v-infinite-scroll="getAccountList" :infinite-scroll-distance="600" :infinite-scroll-immediate="false">
         <el-card class="item" :class="itemBg(item.accountId)" v-for="(item, index) in accounts" :key="item.accountId"
@@ -33,14 +42,6 @@
                   </el-dropdown-menu>
                 </template>
               </el-dropdown>
-            </div>
-          </div>
-          <div v-if="forwardAccountId === item.accountId" class="forward-inline" @click.stop>
-            <span>{{ $t('forwardingEmailPlaceholder') }}</span>
-            <el-input v-model="forwardEmail" type="email" :placeholder="$t('forwardingEmailPlaceholder')" autocomplete="email" />
-            <div class="forward-actions">
-              <el-button size="small" type="primary" :loading="forwardEmailLoading" @click="saveForwardEmail(item)">{{ $t('save') }}</el-button>
-              <el-button size="small" text @click="cancelForwardEmail">{{ $t('cancel') }}</el-button>
             </div>
           </div>
         </el-card>
@@ -172,7 +173,7 @@ const verifyShow = ref(false)
 const setNameShow = ref(false)
 const setNameLoading = ref(false)
 const accountName = ref(null)
-const forwardAccountId = ref(null)
+const forwardAccount = ref(null)
 const forwardEmailLoading = ref(false)
 const forwardEmail = ref('')
 const addRef = ref({})
@@ -284,25 +285,26 @@ function openSetName(accountItem) {
 }
 
 function openSetForwardEmail(accountItem) {
-  forwardAccountId.value = accountItem.accountId
+  forwardAccount.value = accountItem
   forwardEmail.value = accountItem.forwardEmail || ''
 }
 
 function cancelForwardEmail() {
-  forwardAccountId.value = null
+  forwardAccount.value = null
   forwardEmail.value = ''
 }
 
-function saveForwardEmail(accountItem) {
+function saveForwardEmail() {
   const email = forwardEmail.value.trim().toLowerCase()
+  const selectedAccount = forwardAccount.value
   if (email && !isEmail(email)) {
     ElMessage({message: t('notEmailMsg'), type: 'error', plain: true})
     return
   }
 
   forwardEmailLoading.value = true
-  accountSetForwardEmail(accountItem.accountId, email).then(() => {
-    accountItem.forwardEmail = email
+  accountSetForwardEmail(selectedAccount.accountId, email).then(() => {
+    selectedAccount.forwardEmail = email
     cancelForwardEmail()
     ElMessage({message: t('saveSuccessMsg'), type: 'success', plain: true})
   }).finally(() => {
@@ -612,6 +614,34 @@ path[fill="#ffdda1"] {
     }
   }
 
+  .forward-panel {
+    display: grid;
+    gap: 8px;
+    margin: 10px;
+    padding: 12px;
+    border: 1px solid var(--el-border-color);
+    border-radius: 8px;
+    background: var(--el-bg-color);
+
+    .forward-panel-title {
+      font-weight: 600;
+    }
+
+    .forward-panel-account {
+      overflow: hidden;
+      color: var(--el-text-color-secondary);
+      font-size: 12px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .forward-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 4px;
+    }
+  }
+
   .btn {
     width: 100%;
     margin-top: 15px;
@@ -649,25 +679,6 @@ path[fill="#ffdda1"] {
       .send-email {
         display: flex;
         align-items: center;
-      }
-    }
-
-    .forward-inline {
-      display: grid;
-      gap: 8px;
-      margin-top: 12px;
-      padding-top: 10px;
-      border-top: 1px solid var(--el-border-color-lighter);
-
-      > span {
-        color: var(--el-text-color-secondary);
-        font-size: 12px;
-      }
-
-      .forward-actions {
-        display: flex;
-        justify-content: flex-end;
-        gap: 4px;
       }
     }
 
