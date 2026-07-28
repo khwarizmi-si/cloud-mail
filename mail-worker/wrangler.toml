@@ -50,4 +50,4 @@ domain = ["khwarizmi.co.id"]
 admin = "admin@khwarizmi.co.id"
 
 [build]
-command = "cd ../mail-vue && npx vite build --mode release"
+command = "pnpm --prefix ../mail-vue install && pnpm --prefix ../mail-vue run build"
