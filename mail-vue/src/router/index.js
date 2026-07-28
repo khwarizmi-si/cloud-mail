@@ -77,6 +77,22 @@ const router = createRouter({
     routes
 })
 
+const routeReloadKey = 'route-chunk-reload'
+
+router.onError((error) => {
+    const message = error?.message || ''
+    const isStaleChunk = /dynamically imported module|Importing a module script failed/i.test(message)
+
+    if (isStaleChunk && !sessionStorage.getItem(routeReloadKey)) {
+        sessionStorage.setItem(routeReloadKey, '1')
+        window.location.reload()
+        return
+    }
+
+    sessionStorage.removeItem(routeReloadKey)
+    console.error(error)
+})
+
 NProgress.configure({
     showSpinner: false,   // 不显示旋转图标
     trickleSpeed: 50,    // 自动递增速度
@@ -149,6 +165,8 @@ function loadBackground(next) {
 }
 
 router.afterEach((to) => {
+
+    sessionStorage.removeItem(routeReloadKey)
 
     clearTimeout(timer)
     if (first) {
