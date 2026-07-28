@@ -1,0 +1,20 @@
+import { describe, expect, it } from 'vitest';
+import { ApiError, unwrapResult } from './api';
+
+describe('unwrapResult', () => {
+	it('returns data from a successful Worker response', () => {
+		expect(unwrapResult({ code: 200, data: { token: 'abc' } })).toEqual({ token: 'abc' });
+	});
+
+	it('preserves a Worker error code and message', () => {
+		expect(() => unwrapResult({ code: 403, message: 'Tidak diizinkan' })).toThrow(ApiError);
+	});
+
+	it('identifies an unauthenticated response', () => {
+		try {
+			unwrapResult({ code: 401, message: 'Sesi berakhir' });
+		} catch (error) {
+			expect(error).toMatchObject({ code: 401, message: 'Sesi berakhir' });
+		}
+	});
+});
