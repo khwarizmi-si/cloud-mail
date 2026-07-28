@@ -90,7 +90,7 @@ const setNameShow = ref(false)
 const accountName = ref(null)
 const langSelect = ref(settingStore.lang)
 const accounts = ref([])
-const forwardAccountId = ref(userStore.user.account.accountId)
+const forwardAccountId = ref(null)
 const forwardEmail = ref('')
 const forwardEmailLoading = ref(false)
 
@@ -99,8 +99,14 @@ defineOptions({
 })
 
 onMounted(async () => {
-  accounts.value = await accountList(0, 50, null)
-  selectForwardAccount(forwardAccountId.value)
+  try {
+    const list = await accountList(0, 50, null)
+    accounts.value = Array.isArray(list) ? list : []
+    forwardAccountId.value = accountStore.currentAccountId || accounts.value[0]?.accountId || null
+    if (forwardAccountId.value) selectForwardAccount(forwardAccountId.value)
+  } catch (error) {
+    console.error('Gagal memuat pengaturan penerusan email:', error)
+  }
 })
 
 function selectForwardAccount(accountId) {
@@ -111,6 +117,7 @@ function selectForwardAccount(accountId) {
 function saveForwardEmail() {
   const email = forwardEmail.value.trim().toLowerCase()
   const accountId = forwardAccountId.value
+  if (!accountId) return
   if (email && !isEmail(email)) {
     ElMessage({message: t('notEmailMsg'), type: 'error', plain: true})
     return
