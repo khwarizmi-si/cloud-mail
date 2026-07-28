@@ -2,7 +2,12 @@
   <div :class="accountShow && hasPerm('account:query') ? 'main-box-show' : 'main-box-hide'">
     <div :class="accountShow && hasPerm('account:query') ? 'block-show' : 'block-hide'" @click="uiStore.accountShow = false"></div>
     <account  :class="accountShow && hasPerm('account:query') ? 'show' : 'hide'" />
-    <router-view class="main-view" v-slot="{ Component,route }">
+    <div v-if="viewError" class="view-error">
+      <h2>Halaman tidak dapat dimuat</h2>
+      <p>{{ viewError }}</p>
+      <el-button type="primary" @click="reloadPage">Muat ulang halaman</el-button>
+    </div>
+    <router-view v-else class="main-view" v-slot="{ Component,route }">
       <keep-alive :include="['email','all-email','send','sys-setting','star','user','role','analysis','reg-key','draft']">
         <component :is="Component" :key="route.name"/>
       </keep-alive>
@@ -13,7 +18,7 @@
 import account from '@/layout/account/index.vue'
 import {useUiStore} from "@/store/ui.js";
 import {useSettingStore} from "@/store/setting.js";
-import {computed, onBeforeUnmount, onMounted, watch} from "vue";
+import {computed, onBeforeUnmount, onErrorCaptured, onMounted, ref, watch} from "vue";
 import { useRoute } from 'vue-router'
 import { hasPerm } from "@/perm/perm.js"
 
@@ -23,10 +28,20 @@ const route = useRoute()
 let  innerWidth =  window.innerWidth
 
 let elNotification = null
+const viewError = ref('')
 
 const accountShow = computed(() => {
   return uiStore.accountShow && settingStore.settings.manyEmail === 0
 })
+
+onErrorCaptured((error) => {
+  viewError.value = error?.message || 'Terjadi kesalahan saat memuat halaman.'
+  return false
+})
+
+function reloadPage() {
+  window.location.reload()
+}
 
 watch(() => uiStore.changeNotice, () => {
 
@@ -162,6 +177,19 @@ const handleResize = () => {
 
 .main-view {
   background: var(--el-bg-color);
+}
+
+.view-error {
+  display: grid;
+  align-content: center;
+  gap: 12px;
+  padding: 40px;
+  background: var(--el-bg-color);
+
+  p {
+    color: var(--regular-text-color);
+    word-break: break-word;
+  }
 }
 
 
