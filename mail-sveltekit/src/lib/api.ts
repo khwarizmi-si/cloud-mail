@@ -45,7 +45,7 @@ export async function api<T>(path: string, init: RequestInit = {}): Promise<T> {
 	if (token) headers.set('Authorization', token);
 	if (init.body && !headers.has('content-type')) headers.set('content-type', 'application/json');
 
-	const response = await fetch(`${env.PUBLIC_API_BASE_URL ?? ''}${path}`, { ...init, headers });
+	const response = await fetch(`${env.PUBLIC_API_BASE_URL || 'https://mail.khwarizmi.co.id'}${path}`, { ...init, headers });
 	if (!response.ok) throw new ApiError(response.status, 'Server tidak dapat dihubungi.');
 
 	return unwrapResult<T>((await response.json()) as WorkerResult<T>);

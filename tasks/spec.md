@@ -9,8 +9,8 @@ masuk, membaca inbox, mengirim email, dan mengatur penerusan per akun.
 ## Assumptions
 
 - Worker Cloudflare dan endpoint API yang ada tetap menjadi backend.
-- SvelteKit dibangun sebagai static SPA ke `mail-worker/dist` agar Worker yang
-  sama dapat menyajikan asetnya.
+- SvelteKit dibangun sebagai static SPA mandiri. Ia memanggil API Worker yang
+  sudah ada di `https://mail.khwarizmi.co.id`; backend tidak diubah.
 - Migrasi pertama mencakup fitur inti pengguna; halaman admin dimigrasikan
   setelah alur pengguna tervalidasi.
 - Target awal adalah deployment uji terpisah, bukan `mail.khwarizmi.co.id`.
@@ -27,7 +27,7 @@ masuk, membaca inbox, mengirim email, dan mengatur penerusan per akun.
 - `mail-sveltekit/src/routes` — rute aplikasi.
 - `mail-sveltekit/src/lib` — klien API, sesi, dan komponen bersama.
 - `mail-sveltekit/tests` — tes unit dan integrasi.
-- `mail-worker` — backend Cloudflare yang tidak diubah pada tahap pertama.
+- `mail-worker` — backend Cloudflare yang tidak diubah oleh refactor ini.
 
 ## Boundaries
 

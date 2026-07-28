@@ -12,9 +12,7 @@ export default defineConfig({
 			},
 
 			adapter: adapter({
-				fallback: '200.html',
-				pages: '../mail-worker/dist',
-				assets: '../mail-worker/dist'
+				fallback: '200.html'
 			})
 		})
 	]
