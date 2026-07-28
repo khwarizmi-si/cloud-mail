@@ -82,3 +82,21 @@ export const listInbox = (account: Account) =>
 		size: 50,
 		type: 0
 	}));
+
+export const markRead = (emailIds: number[]) =>
+	api<void>('/email/read', { method: 'PUT', body: JSON.stringify({ emailIds }) });
+
+export type SendMail = {
+	accountId: number;
+	sendEmail: string;
+	name?: string;
+	receiveEmail: string[];
+	subject: string;
+	content: string;
+	text: string;
+	sendType: '' | 'reply' | 'forward';
+	emailId: number;
+	attachments: unknown[];
+};
+
+export const sendMail = (mail: SendMail) => api<Mail[]>('/email/send', { method: 'POST', body: JSON.stringify(mail) });
