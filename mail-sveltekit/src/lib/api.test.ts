@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ApiError, query, requiresAuthentication, unwrapResult } from './api';
+import { ApiError, apiBaseUrl, query, requiresAuthentication, unwrapResult } from './api';
 
 describe('unwrapResult', () => {
 	it('returns data from a successful Worker response', () => {
@@ -26,5 +26,9 @@ describe('unwrapResult', () => {
 		expect(requiresAuthentication('/settings', null)).toBe(true);
 		expect(requiresAuthentication('/login', null)).toBe(false);
 		expect(requiresAuthentication('/inbox', 'token')).toBe(false);
+	});
+
+	it('always uses the same-origin API path', () => {
+		expect(apiBaseUrl).toBe('/api');
 	});
 });
