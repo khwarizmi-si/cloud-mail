@@ -65,7 +65,7 @@
 		</label>
 	{/if}
 	<section>
-		<div class="toolbar"><strong>{total} email</strong><span><button onclick={() => goto('/compose')}>Tulis</button> <button onclick={() => load()}>Muat ulang</button></span></div>
+		<div class="toolbar"><strong>{total} email</strong><span><button onclick={() => goto('/compose')}>Tulis</button> <button onclick={() => goto('/settings')}>Pengaturan</button> <button onclick={() => load()}>Muat ulang</button></span></div>
 		{#if loading}<p class="state">Memuat email…</p>
 		{:else if error}<p class="state error" role="alert">{error}</p>
 		{:else if messages.length === 0}<p class="state">Tidak ada email ditemukan.</p>

@@ -100,3 +100,6 @@ export type SendMail = {
 };
 
 export const sendMail = (mail: SendMail) => api<Mail[]>('/email/send', { method: 'POST', body: JSON.stringify(mail) });
+
+export const setForwardEmail = (accountId: number, forwardEmail: string) =>
+	api<void>('/account/setForwardEmail', { method: 'PUT', body: JSON.stringify({ accountId, forwardEmail }) });
