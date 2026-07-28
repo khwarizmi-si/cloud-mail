@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ApiError, query, unwrapResult } from './api';
+import { ApiError, query, requiresAuthentication, unwrapResult } from './api';
 
 describe('unwrapResult', () => {
 	it('returns data from a successful Worker response', () => {
@@ -20,5 +20,11 @@ describe('unwrapResult', () => {
 
 	it('serializes only defined query values', () => {
 		expect(query('/email/list', { accountId: 1, empty: undefined })).toBe('/email/list?accountId=1');
+	});
+
+	it('requires a token for every route except login', () => {
+		expect(requiresAuthentication('/settings', null)).toBe(true);
+		expect(requiresAuthentication('/login', null)).toBe(false);
+		expect(requiresAuthentication('/inbox', 'token')).toBe(false);
 	});
 });

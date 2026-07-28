@@ -33,6 +33,10 @@ export function clearToken() {
 	if (browser) localStorage.removeItem('token');
 }
 
+export function requiresAuthentication(pathname: string, token: string | null) {
+	return pathname !== '/login' && !token;
+}
+
 export async function api<T>(path: string, init: RequestInit = {}): Promise<T> {
 	const headers = new Headers(init.headers);
 	headers.set('accept-language', 'id');
