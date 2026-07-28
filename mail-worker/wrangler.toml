@@ -1,4 +1,5 @@
 name = "cloud-mail"
+account_id = "1ef2e18dc9de53cb201f3ca19b77bebb"
 workers_dev = true
 main = "src/index.js"
 compatibility_date = "2025-06-04"
@@ -50,4 +51,4 @@ domain = ["khwarizmi.co.id"]
 admin = "admin@khwarizmi.co.id"
 
 [build]
-command = "pnpm --prefix ../mail-vue install && pnpm --prefix ../mail-vue run build"
+command = "cd ../mail-vue && ./node_modules/.bin/vite build --mode release && ! grep -q '/src/main.js' ../mail-worker/dist/index.html"

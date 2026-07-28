@@ -18,6 +18,8 @@ jobs:
       CUSTOM_DOMAIN: ${{ secrets.CUSTOM_DOMAIN || vars.CUSTOM_DOMAIN }}
       DOMAIN: ${{ secrets.DOMAIN || vars.DOMAIN }}
       ADMIN: ${{ secrets.ADMIN || vars.ADMIN }}
+      JWT_SECRET_V2: ${{ secrets.JWT_SECRET_V2 }}
+      RESEND_WEBHOOK_SECRET: ${{ secrets.RESEND_WEBHOOK_SECRET }}
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN || vars.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID || vars.CLOUDFLARE_ACCOUNT_ID }}
       D1_DATABASE_ID: ${{ secrets.D1_DATABASE_ID || vars.D1_DATABASE_ID }}
@@ -57,6 +59,10 @@ jobs:
         run: pnpm install --frozen-lockfile
         working-directory: ./mail-worker
 
+      - name: 🎨 构建前端 / Build frontend
+        run: pnpm install --frozen-lockfile
+        working-directory: ./mail-vue
+
       - name: 📡 禁用 Wrangler 遥测 / Disable wrangler telemetry
         working-directory: ./mail-worker
         run: pnpm wrangler telemetry disable
@@ -74,6 +80,11 @@ jobs:
           
           if [ -z "$ADMIN" ]; then
             echo "❌ ADMIN variable cannot be empty."
+            exit 1
+          fi
+
+          if [ -z "$JWT_SECRET_V2" ] || [ -z "$RESEND_WEBHOOK_SECRET" ]; then
+            echo "❌ JWT_SECRET_V2 and RESEND_WEBHOOK_SECRET must be configured as GitHub Actions secrets."
             exit 1
           fi
           
@@ -232,6 +243,18 @@ jobs:
           
           echo "worker_url=$WORKER_URL" >> $GITHUB_OUTPUT
           echo "✅ Setup completed."
+
+      - name: 🔐 设置 Worker secrets / Set Worker secrets
+        working-directory: ./mail-worker
+        run: |
+          workflow_secret_file=$(mktemp)
+          trap 'rm -f "$workflow_secret_file"' EXIT
+
+          printf '%s' "$JWT_SECRET_V2" > "$workflow_secret_file"
+          pnpm wrangler secret put jwt_secret_v2 -c wrangler-action.toml < "$workflow_secret_file"
+
+          printf '%s' "$RESEND_WEBHOOK_SECRET" > "$workflow_secret_file"
+          pnpm wrangler secret put resend_webhook_secret -c wrangler-action.toml < "$workflow_secret_file"
 
       - name: 🗑️ 删除运行记录 / Delete workflow runs
         uses: GitRML/delete-workflow-runs@main
