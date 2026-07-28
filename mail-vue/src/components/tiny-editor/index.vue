@@ -6,9 +6,8 @@
 </template>
 
 <script setup>
-import {ref, onMounted, onBeforeUnmount, watch, nextTick, shallowRef, defineEmits, computed} from 'vue';
+import {ref, onMounted, onBeforeUnmount, watch, nextTick, shallowRef, defineEmits} from 'vue';
 import loading from "@/components/loading/index.vue";
-import {useI18n} from 'vue-i18n'
 import {useUiStore} from '@/store/ui.js'
 import {useSettingStore} from '@/store/setting.js'
 
@@ -30,7 +29,6 @@ const props = defineProps({
 });
 
 
-const {locale} = useI18n()
 const emit = defineEmits(['change','focus']);
 const editor = shallowRef(null);
 const isInitialized = ref(false);
@@ -57,14 +55,6 @@ watch(() => [uiStore.dark, settingStore.lang], () => {
   destroyEditor();
   initEditor();
 });
-
-const language = computed(() => {
-  if (locale.value === 'zh') {
-    return 'zh_CN'
-  }
-
-  return locale.value === 'id' ? 'id' : 'en'
-})
 
 function clearEditor() {
   if (editor.value) {
@@ -105,8 +95,11 @@ function initEditor() {
     toolbar_mode: 'scrolling',
     font_size_formats: '8px 10px 12px 14px 16px 18px 24px 36px',
     emoticons_search: false,
-    language: language.value,
-    language_load: true,
+    // Bundel TinyMCE hanya menyertakan zh_CN. Untuk bahasa Indonesia,
+    // gunakan antarmuka bawaan (Inggris) agar tidak mencoba memuat id.js
+    // yang tidak ada dan membuat halaman gagal dirender.
+    language: settingStore.lang === 'zh' ? 'zh_CN' : undefined,
+    language_load: settingStore.lang === 'zh',
     menubar: false,
     license_key: 'gpl',
     noneditable_class: 'mceNonEditable',
