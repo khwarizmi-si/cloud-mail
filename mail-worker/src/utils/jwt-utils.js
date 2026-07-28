@@ -13,19 +13,19 @@ const base64urlDecode = (str) => {
 };
 
 const jwtUtils = {
-	async generateToken(c, payload, expiresInSeconds) {
+	async generateToken(c, payload, expiresInSeconds = 15 * 60) {
 		const header = {
 			alg: 'HS256',
 			typ: 'JWT'
 		};
 
 		const now = Math.floor(Date.now() / 1000);
-		const exp = expiresInSeconds ? now + expiresInSeconds : undefined;
+		const exp = now + expiresInSeconds;
 
 		const fullPayload = {
 			...payload,
 			iat: now,
-			...(exp ? { exp } : {})
+			exp
 		};
 
 		const headerStr = base64url(encoder.encode(JSON.stringify(header)));
