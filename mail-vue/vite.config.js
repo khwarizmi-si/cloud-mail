@@ -8,11 +8,22 @@ import {VitePWA} from 'vite-plugin-pwa';
 
 export default defineConfig(({mode}) => {
     const env = loadEnv(mode, process.cwd(), 'VITE')
+    const apiProxyTarget = process.env.VITE_API_PROXY_TARGET
+    const apiBaseUrl = apiProxyTarget ? '/api' : env.VITE_BASE_URL
     return {
         server: {
             host: true,
             port: 3001,
             hmr: true,
+            proxy: apiProxyTarget ? {
+                '/api': {
+                    target: apiProxyTarget,
+                    changeOrigin: true,
+                }
+            } : undefined,
+        },
+        define: {
+            'import.meta.env.VITE_BASE_URL': JSON.stringify(apiBaseUrl),
         },
         base: env.VITE_STATIC_URL || '/',
         plugins: [vue(),

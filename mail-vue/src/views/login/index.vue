@@ -1,15 +1,29 @@
 <template>
   <div id="login-box" :style=" background ? 'background: var(--el-bg-color)' : ''" v-loading="oauthLoading" element-loading-text="登录中...">
-    <div id="background-wrap" v-if="!settingStore.settings.background">
-      <div class="x1 cloud"></div>
-      <div class="x2 cloud"></div>
-      <div class="x3 cloud"></div>
-      <div class="x4 cloud"></div>
-      <div class="x5 cloud"></div>
+    <div v-if="background" class="custom-background" :style="background"></div>
+    <div id="background-wrap" aria-hidden="true">
+      <img class="sun" src="/image/login-sun.svg?v=1" alt=""/>
+      <img class="x1 cloud" src="/image/login-cloud.svg?v=4" alt=""/>
+      <img class="x2 cloud" src="/image/login-cloud.svg?v=4" alt=""/>
+      <img class="x3 cloud" src="/image/login-cloud.svg?v=4" alt=""/>
+      <img class="x4 cloud" src="/image/login-cloud.svg?v=4" alt=""/>
+      <img class="x5 cloud" src="/image/login-cloud.svg?v=4" alt=""/>
     </div>
-    <div v-else :style="background"></div>
+    <div class="login-scrim" aria-hidden="true"></div>
+    <aside class="brand-panel" aria-hidden="true">
+      <div class="orbit-scene">
+        <div class="orbit orbit-one"><i></i></div>
+        <div class="orbit orbit-two"><i></i></div>
+        <div class="orbit orbit-three"><i></i></div>
+        <div class="brand-mark"><Icon icon="mingcute:mail-send-line" width="42" height="42"/></div>
+      </div>
+      <p class="brand-kicker">Khwarizmi Mail</p>
+      <h1>{{ settingStore.settings.title }}</h1>
+      <p class="brand-copy">Ruang kerja email yang aman untuk percakapan penting Anda.</p>
+    </aside>
     <div class="form-wrapper">
       <div class="container">
+        <img class="login-logo" src="/mail.png" alt="Khwarizmi"/>
         <span class="form-title">{{ settingStore.settings.title }}</span>
         <span class="form-desc" v-if="show === 'login'">{{ $t('loginTitle') }}</span>
         <span class="form-desc" v-else>{{ $t('regTitle') }}</span>
@@ -595,6 +609,7 @@ function submitRegister() {
 .form-wrapper {
   position: fixed;
   right: 0;
+  width: min(100%, 500px);
   height: 100%;
   z-index: 10;
   display: flex;
@@ -607,34 +622,45 @@ function submitRegister() {
 
 .container {
   background: v-bind(loginOpacity);
-  padding-left: 40px;
-  padding-right: 40px;
+  padding: 48px 52px;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  width: 450px;
+  width: 100%;
   height: 100%;
   border-left: 1px solid var(--login-border);
-  box-shadow: var(--el-box-shadow-light);
+  box-shadow: -18px 0 50px rgba(15, 39, 48, 0.12);
+  backdrop-filter: blur(12px);
   @media (max-width: 1024px) {
     padding: 20px 18px;
-    width: 384px;
-    margin-left: 18px;
+    width: 100%;
   }
   @media (max-width: 767px) {
     border: 1px solid var(--login-border);
-    padding: 20px 18px;
-    border-radius: 6px;
+    padding: 32px 24px;
+    border-radius: 16px;
     height: fit-content;
-    width: 100%;
+    width: calc(100% - 36px);
     margin-right: 18px;
     margin-left: 18px;
+    box-shadow: 0 20px 50px rgba(15, 39, 48, 0.18);
   }
 
   .btn {
-    height: 36px;
+    height: 42px;
     width: 100%;
-    border-radius: 6px;
+    border-radius: 10px;
+    font-weight: 700;
+    transition: transform 150ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 150ms ease;
+
+    &:not(.is-disabled):hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 20px rgba(23, 121, 111, 0.22);
+    }
+
+    &:not(.is-disabled):active {
+      transform: translateY(0);
+    }
   }
 
   .form-desc {
@@ -644,8 +670,9 @@ function submitRegister() {
   }
 
   .form-title {
-    font-weight: bold;
-    font-size: 22px !important;
+    font-weight: 750;
+    font-size: 28px !important;
+    letter-spacing: -0.025em;
   }
 
   .switch {
@@ -659,12 +686,18 @@ function submitRegister() {
   }
 
   :deep(.el-input__wrapper) {
-    border-radius: 6px;
+    border-radius: 10px;
     background: var(--el-bg-color);
+    transition: box-shadow 180ms ease, transform 180ms ease;
+
+    &.is-focus {
+      box-shadow: 0 0 0 3px rgba(20, 126, 111, 0.18);
+      transform: translateY(-1px);
+    }
   }
 
   .email-input :deep(.el-input__wrapper) {
-    border-radius: 6px 0 0 6px;
+    border-radius: 10px 0 0 10px;
     background: var(--el-bg-color);
   }
 
@@ -755,8 +788,8 @@ function submitRegister() {
 
 
 #login-box {
-  background: linear-gradient(to bottom, #2980b9, #6dd5fa, #fff);
-  font: 100% Arial, sans-serif;
+  background: #0f393d;
+  font: 100% system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   height: 100%;
   margin: 0;
   padding: 0;
@@ -765,9 +798,141 @@ function submitRegister() {
   grid-template-columns: 1fr;
 }
 
+.login-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(105deg, rgba(4, 40, 45, 0.8) 0%, rgba(5, 57, 59, 0.58) 48%, rgba(6, 36, 43, 0.22) 72%, rgba(255, 255, 255, 0.08) 100%);
+}
+
+.brand-panel {
+  position: fixed;
+  z-index: 3;
+  inset: 0 500px 0 0;
+  color: #f4fffe;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(48px, 9vw, 144px);
+
+  h1 {
+    max-width: 520px;
+    margin: 22px 0 16px;
+    font-size: 42px;
+    line-height: 1.08;
+    letter-spacing: -0.035em;
+    text-wrap: balance;
+  }
+}
+
+.brand-kicker {
+  margin: 14px 0 0;
+  color: rgba(231, 255, 252, 0.78);
+  font-size: 12px;
+  font-weight: 750;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.login-logo {
+  width: 52px;
+  height: 52px;
+  margin-bottom: 14px;
+  object-fit: contain;
+}
+
+.brand-copy {
+  max-width: 430px;
+  margin: 0;
+  color: rgba(235, 255, 252, 0.84);
+  font-size: 17px;
+  line-height: 1.6;
+}
+
+.orbit-scene {
+  position: relative;
+  width: 146px;
+  height: 146px;
+}
+
+.brand-mark {
+  position: absolute;
+  inset: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: #073d40;
+  background: #eafff8;
+  box-shadow: 0 0 0 12px rgba(228, 255, 249, 0.08), 0 18px 38px rgba(1, 27, 31, 0.32);
+}
+
+.orbit {
+  position: absolute;
+  inset: 0;
+  border: 1px solid rgba(230, 255, 250, 0.32);
+  border-radius: 50%;
+  animation: orbit-spin 18s linear infinite;
+
+  i {
+    position: absolute;
+    top: -4px;
+    left: 50%;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #ffbe5c;
+    box-shadow: 0 0 16px rgba(255, 190, 92, 0.8);
+  }
+}
+
+.orbit-two {
+  inset: 16px -16px;
+  border-color: rgba(110, 232, 216, 0.38);
+  animation-duration: 14s;
+  animation-direction: reverse;
+}
+
+.orbit-three {
+  inset: -15px 18px;
+  border-color: rgba(244, 255, 254, 0.18);
+  animation-duration: 22s;
+}
+
+@keyframes orbit-spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 1024px) {
+  .form-wrapper { width: 384px; }
+  .brand-panel { inset-right: 384px; padding: 56px; }
+  .brand-panel h1 { font-size: 34px; }
+}
+
+@media (max-width: 767px) {
+  .brand-panel { display: none; }
+  .login-scrim { background: rgba(3, 40, 44, 0.4); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .orbit, .container .btn, .container :deep(.el-input__wrapper) {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
 
 #background-wrap {
-  height: 100%;
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.custom-background {
+  position: fixed;
+  inset: 0;
   z-index: 0;
 }
 
@@ -782,61 +947,62 @@ function submitRegister() {
 }
 
 .x1 {
+  top: 11%;
   animation: animateCloud 30s linear infinite;
+  animation-delay: -12s;
   transform: scale(0.65);
 }
 
 .x2 {
+  top: 53%;
   animation: animateCloud 15s linear infinite;
+  animation-delay: -6s;
   transform: scale(0.3);
 }
 
 .x3 {
+  top: 28%;
   animation: animateCloud 25s linear infinite;
+  animation-delay: -15s;
   transform: scale(0.5);
 }
 
 .x4 {
+  top: 68%;
   animation: animateCloud 13s linear infinite;
+  animation-delay: -4s;
   transform: scale(0.4);
 }
 
 .x5 {
+  top: 78%;
   animation: animateCloud 20s linear infinite;
+  animation-delay: -11s;
   transform: scale(0.55);
 }
 
 .cloud {
-  background: linear-gradient(to bottom, #fff 5%, #f1f1f1 100%);
-  border-radius: 100px;
-  box-shadow: 0 8px 5px rgba(0, 0, 0, 0.1);
-  height: 120px;
-  width: 350px;
-  position: relative;
-}
-
-.cloud:after,
-.cloud:before {
-  content: "";
+  width: 310px;
   position: absolute;
-  background: #fff;
-  z-index: -1;
+  opacity: 0.82;
+  filter: drop-shadow(0 12px 14px rgba(0, 20, 27, 0.14));
 }
 
-.cloud:after {
-  border-radius: 100px;
-  height: 100px;
-  left: 50px;
-  top: -50px;
-  width: 100px;
+.sun {
+  position: absolute;
+  top: 42px;
+  left: 54px;
+  width: 116px;
+  animation: sun-float 5s ease-in-out infinite;
+  filter: drop-shadow(0 12px 15px rgba(99, 59, 0, 0.2));
 }
 
-.cloud:before {
-  border-radius: 200px;
-  height: 180px;
-  width: 180px;
-  right: 50px;
-  top: -90px;
+@keyframes sun-float {
+  50% { transform: translateY(-8px) rotate(3deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cloud, .sun { animation: none; }
 }
 
 </style>
