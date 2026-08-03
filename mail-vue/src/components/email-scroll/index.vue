@@ -38,7 +38,7 @@
                         :key="keyCount"
         >
           <template #default="{ data: item, index }" >
-            <div :class="'email-row ' + props.type"
+            <div :class="['email-row ' + props.type, { 'is-unread': item.unread === EmailUnreadEnum.UNREAD && showUnread }]"
                  :data-checked="item.checked"
                  @click="jumpDetails(item)"
                  v-if="!item.expand"
@@ -390,7 +390,12 @@ const { arrivedState } = useScroll(scrollbarRef, {
 
 
 const list = computed(() => {
-  return [...emailList, ...expandList]
+  const query = uiStore.searchQuery.trim().toLowerCase()
+  const filtered = query && props.type === 'email'
+      ? emailList.filter(item => [item.name, item.subject, item.sendEmail, item.toEmail, item.formatText]
+          .some(value => String(value || '').toLowerCase().includes(query)))
+      : emailList
+  return [...filtered, ...expandList]
 })
 
 const itemHeight = computed(() => {
@@ -921,7 +926,12 @@ function loadData() {
   font-size: 14px;
   color: var(--el-text-color-primary);
   overflow: hidden;
-  height: 100%;
+  height: calc(100% - 14px);
+  margin: 14px 16px 0;
+  border: 1px solid var(--light-border);
+  border-bottom: 0;
+  border-radius: 12px 12px 0 0;
+  background: var(--el-bg-color);
 }
 
 .scroll {
@@ -990,7 +1000,7 @@ function loadData() {
   align-items: center;
   position: relative;
   transition: background 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-  height: 48px;
+  height: 52px;
   @media (max-width: 1366px) {
     height: 83px;
   }
@@ -1237,9 +1247,13 @@ function loadData() {
     z-index: 0;
   }
 
-  /*&[data-checked="true"] {
-    background-color: #c2dbff;
-  }*/
+  &.is-unread {
+    background: color-mix(in srgb, var(--el-color-primary-light-9) 48%, var(--el-bg-color));
+  }
+
+  &[data-checked="true"] {
+    background: var(--el-color-primary-light-9);
+  }
 }
 
 
@@ -1280,7 +1294,8 @@ function loadData() {
   grid-template-columns: auto 1fr auto;
   align-items: center;
   gap: 15px;
-  padding: 3px 15px;
+  min-height: 52px;
+  padding: 8px 14px;
   box-shadow: var(--header-actions-border);
 
   .header-left {
@@ -1288,7 +1303,7 @@ function loadData() {
     flex-wrap: wrap;
     align-items: center;
     position: relative;
-    column-gap: 20px;
+    column-gap: 16px;
     row-gap: 8px;
     padding-left: 2px;
     color: var(--el-text-color-primary);;
@@ -1303,7 +1318,8 @@ function loadData() {
 
     .email-count {
       white-space: nowrap;
-      margin-top: 6px;
+      margin-top: 4px;
+      color: var(--secondary-text-color);
     }
   }
 
@@ -1313,8 +1329,20 @@ function loadData() {
   }
 
   .more-icon {
-    margin-top: 8px;
-    margin-left: 15px;
+    margin-top: 4px;
+    margin-left: 12px;
+  }
+}
+
+@media (max-width: 767px) {
+  .email-container {
+    height: calc(100% - 8px);
+    margin: 8px 8px 0;
+    border-radius: 10px 10px 0 0;
+  }
+
+  .header-actions {
+    padding: 8px 10px;
   }
 }
 

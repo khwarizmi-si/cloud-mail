@@ -8,6 +8,10 @@
           <span>KHARIZMI MAIL</span>
         </div>
       </div>
+      <button v-perm="'email:send'" type="button" class="compose-button" @click="openSend">
+        <Icon icon="material-symbols:edit-outline-sharp" width="20" height="20" />
+        <span>{{ $t('send') }}</span>
+      </button>
       <el-menu :collapse="false" text-color="#fff" active-text-color="#fff" style="margin-top: 10px">
         <el-menu-item @click="router.push({name: 'email'})" index="email"
                       :class="route.meta.name === 'email' ? 'choose-item' : ''">
@@ -77,28 +81,31 @@ import router from "@/router/index.js";
 import { useRoute } from "vue-router";
 import {Icon} from "@iconify/vue";
 import {useSettingStore} from "@/store/setting.js";
+import {useUiStore} from "@/store/ui.js";
 
 const settingStore = useSettingStore();
 const route = useRoute();
+const uiStore = useUiStore();
+
+function openSend() {
+  uiStore.writerRef?.open()
+}
 
 </script>
 
 <style lang="scss" scoped>
 
 .title {
-  margin: 18px 12px 22px;
+  margin: 16px 16px 18px;
   min-height: 56px;
-  border-radius: 12px;
   display: flex;
   font-size: 15px;
   align-items: center;
   justify-content: flex-start;
   gap: 10px;
-  color: #ffffff;
-  background: #0d625d;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--khwarizmi-teal-950);
   max-width: 240px;
-  padding: 8px 12px;
+  padding: 8px 4px;
 
   .brand-mark {
     width: 34px;
@@ -122,7 +129,7 @@ const route = useRoute();
     }
 
     span {
-      color: #bce1dd;
+      color: var(--khwarizmi-teal-800);
       font-size: 9px;
       font-weight: 700;
       letter-spacing: 0.12em;
@@ -144,11 +151,34 @@ const route = useRoute();
 
 }
 
+.compose-button {
+  min-height: 44px;
+  margin: 0 16px 18px;
+  padding: 0 18px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid var(--el-color-primary-light-7);
+  border-radius: 12px;
+  background: var(--el-color-primary-light-9);
+  color: var(--khwarizmi-teal-950);
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
+
+  &:hover,
+  &:focus-visible {
+    background: var(--el-color-primary-light-7);
+    border-color: var(--el-color-primary-light-5);
+    transform: translateY(-1px);
+  }
+}
+
 
 .manage-title {
   margin: 20px 0 7px;
   padding-left: 22px;
-  color: #a6ceca;
+  color: var(--secondary-text-color);
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -160,12 +190,13 @@ const route = useRoute();
   border-radius: 8px;
   height: 40px;
   padding: 10px !important;
+  color: var(--regular-text-color) !important;
 }
 
 .choose-item {
   font-weight: bold;
-  color: #ffffff !important;
-  background: #0d625d !important;
+  color: var(--khwarizmi-teal-950) !important;
+  background: var(--el-color-primary-light-9) !important;
 
   :deep(svg) {
     color: var(--khwarizmi-orange);
@@ -174,7 +205,7 @@ const route = useRoute();
 
 @media (hover: hover) {
   .el-menu-item:hover {
-    background: rgba(255, 255, 255, 0.09) !important;
+    background: var(--el-color-primary-light-9) !important;
   }
 }
 
@@ -184,16 +215,16 @@ const route = useRoute();
 
 
 :deep(.el-scrollbar__wrap--hidden-default ) {
-  background: var(--aside-backgound) !important;
+  background: var(--extra-light-fill) !important;
 }
 
 :deep(.el-menu-item) {
-  background: var(--aside-backgound);
+  background: var(--extra-light-fill);
   transition: background-color 180ms ease, color 180ms ease;
 }
 
 :deep(.el-menu) {
-  background: var(--aside-backgound);
+  background: var(--extra-light-fill);
 }
 
 .el-menu {

@@ -10,6 +10,7 @@ export const useUiStore = defineStore('ui', {
         changePreview: 0,
         previewData: {},
         key: 0,
+        searchQuery: '',
         dark: false,
         asideCount: {
             email: 0,

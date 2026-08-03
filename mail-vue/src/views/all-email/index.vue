@@ -122,6 +122,12 @@ const showBathDelete = ref(false)
 const clearLoading = ref(false)
 
 onMounted(() => {
+  const globalQuery = typeof route.query.q === 'string' ? route.query.q.trim() : ''
+  if (globalQuery) {
+    searchValue.value = globalQuery
+    params.searchType = 'subject'
+    search()
+  }
   latest();
 })
 

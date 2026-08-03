@@ -1,24 +1,25 @@
 <template>
   <el-container class="layout">
-    <el-aside
-        class="aside"
-        :class="uiStore.asideShow ? 'aside-show' : 'el-aside-hide'">
-      <Aside />
-    </el-aside>
-    <div
-        :class="(uiStore.asideShow && isMobile)? 'overlay-show':'overlay-hide'"
-        @click="uiStore.asideShow = false"
-    ></div>
-    <el-container class="main-container">
-      <el-main>
-        <el-header>
-            <Header />
-        </el-header>
+    <el-header class="topbar">
+      <Header />
+    </el-header>
+    <el-container class="body-shell">
+      <el-aside
+          class="aside"
+          :class="uiStore.asideShow ? 'aside-show' : 'el-aside-hide'">
+        <Aside />
+      </el-aside>
+      <div
+          :class="(uiStore.asideShow && isMobile)? 'overlay-show':'overlay-hide'"
+          @click="uiStore.asideShow = false"
+      ></div>
+      <el-main class="main-container">
         <Main />
       </el-main>
     </el-container>
   </el-container>
   <writer ref="writerRef" />
+  <SupportBubble />
 </template>
 
 <script setup>
@@ -28,6 +29,7 @@ import Main from '@/layout/main/index.vue'
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 import {useUiStore} from "@/store/ui.js";
 import writer from '@/layout/write/index.vue'
+import SupportBubble from '@/components/support-bubble/index.vue'
 
 const uiStore = useUiStore();
 const writerRef = ref({})
@@ -60,8 +62,7 @@ onBeforeUnmount(() => {
 }
 
 .aside-show {
-  -webkit-box-shadow: var(--aside-right-border);
-  box-shadow: var(--aside-right-border);
+  border-right: 1px solid var(--light-border);
   transform: translateX(0);
   transition: all 100ms ease;
   z-index: 101;
@@ -87,23 +88,44 @@ onBeforeUnmount(() => {
   top: 0;
   left: 0;
   overflow: hidden;
+  background: var(--extra-light-fill);
+}
+
+.topbar {
+  height: 64px;
+  flex: 0 0 64px;
+  padding: 0 22px;
+  background: var(--el-bg-color);
+  border-bottom: 1px solid var(--light-border);
+}
+
+.body-shell {
+  min-height: 0;
+  flex: 1;
+  position: relative;
 }
 
 .main-container {
-  min-height: 100%;
+  min-height: 0;
   background: var(--extra-light-fill);
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-}
-
-.el-main {
   padding: 0;
 }
 
-.el-header {
-  background: color-mix(in srgb, var(--el-bg-color) 94%, var(--el-color-primary-light-9));
-  border-bottom: solid 1px var(--light-border);
-  padding: 0 18px;
+@media (max-width: 1025px) {
+  .topbar {
+    height: 58px;
+    flex-basis: 58px;
+    padding: 0 14px;
+  }
+}
+
+@media (max-width: 767px) {
+  .topbar {
+    height: 104px;
+    flex-basis: 104px;
+  }
 }
 
 .overlay-show {
