@@ -152,6 +152,7 @@ const handleResize = () => {
   position: fixed;
   transform: translateX(-100%);
   opacity: 0;
+  pointer-events: none;
   @media (max-width: 1024px) {
     width: 260px;
     z-index: 100;

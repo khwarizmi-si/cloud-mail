@@ -38,6 +38,8 @@ const toggleClick = () => {
 
 .hamburger-button {
   padding: 0 12px;
+  min-width: 44px;
+  min-height: 44px;
   display: inline-flex;
   align-items: center;
   justify-content: center;

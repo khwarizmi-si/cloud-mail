@@ -1,13 +1,13 @@
 <template>
   <el-container class="layout">
     <el-header class="topbar">
-      <Header />
+      <Header ref="headerRef" />
     </el-header>
     <el-container class="body-shell">
       <el-aside
           class="aside"
-          :class="uiStore.asideShow ? 'aside-show' : 'el-aside-hide'">
-        <Aside />
+          :class="asideClass">
+        <Aside :collapsed="!uiStore.asideShow && !isMobile" />
       </el-aside>
       <div
           :class="(uiStore.asideShow && isMobile)? 'overlay-show':'overlay-hide'"
@@ -26,28 +26,60 @@
 import Aside from '@/layout/aside/index.vue'
 import Header from '@/layout/header/index.vue'
 import Main from '@/layout/main/index.vue'
-import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import {useUiStore} from "@/store/ui.js";
 import writer from '@/layout/write/index.vue'
 import SupportBubble from '@/components/support-bubble/index.vue'
 
 const uiStore = useUiStore();
 const writerRef = ref({})
+const headerRef = ref(null)
 const isMobile = ref(window.innerWidth < 1025)
+
+const asideClass = computed(() => {
+  if (uiStore.asideShow) return 'aside-show'
+  return isMobile.value ? 'el-aside-hide' : 'aside-rail'
+})
 const handleResize = () => {
   isMobile.value = window.innerWidth < 1025
   uiStore.asideShow = window.innerWidth > 1024;
+}
+
+// ponytail: global shortcuts kept to the two lowest-risk, highest-value ones (/ and c);
+// j/k row navigation needs shared focus-index state across virtual-scrolled + keep-alive
+// list views and was skipped as a separate, bigger piece of work.
+function isTypingTarget(el) {
+  if (!el) return false
+  const tag = el.tagName
+  return tag === 'INPUT' || tag === 'TEXTAREA' || el.isContentEditable
+}
+
+function handleGlobalKeydown(event) {
+  if (event.metaKey || event.ctrlKey || event.altKey) return
+
+  if (event.key === '/' && !isTypingTarget(document.activeElement)) {
+    event.preventDefault()
+    headerRef.value?.focusSearch()
+    return
+  }
+
+  if (event.key === 'c' && !isTypingTarget(document.activeElement)) {
+    event.preventDefault()
+    writerRef.value?.open?.()
+  }
 }
 
 onMounted(() => {
   uiStore.writerRef = writerRef
 
   window.addEventListener('resize', handleResize)
+  window.addEventListener('keydown', handleGlobalKeydown)
   handleResize()
 })
 
 onBeforeUnmount(() => {
   window.removeEventListener('resize', handleResize)
+  window.removeEventListener('keydown', handleGlobalKeydown)
 })
 </script>
 
@@ -74,6 +106,12 @@ onBeforeUnmount(() => {
     height: 100%;
     background: var(--el-bg-color);
   }
+}
+
+.aside-rail {
+  border-right: 1px solid var(--light-border);
+  transition: all 100ms ease;
+  z-index: 101;
 }
 
 .el-aside {
