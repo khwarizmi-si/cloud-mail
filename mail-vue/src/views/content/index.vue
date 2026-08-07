@@ -62,6 +62,16 @@
               </div>
             </div>
           </div>
+          <div class="reply-bar" v-if="emailStore.contentData.showReply" v-perm="'email:send'">
+            <button type="button" class="reply-btn" @click="openReply">
+              <Icon icon="la:reply" width="18" height="18"/>
+              <span>{{ $t('reply') }}</span>
+            </button>
+            <button type="button" class="reply-btn forward-btn" @click="openForward">
+              <Icon icon="iconoir:arrow-up-right" width="18" height="18"/>
+              <span>{{ $t('forward') }}</span>
+            </button>
+          </div>
         </div>
       </div>
     </el-scrollbar>
@@ -85,7 +95,7 @@ import {useAccountStore} from "@/store/account.js";
 import {formatDetailDate} from "@/utils/day.js";
 import {starAdd, starCancel} from "@/request/star.js";
 import {getExtName, formatBytes} from "@/utils/file-utils.js";
-import {cvtR2Url,toOssDomain} from "@/utils/convert.js";
+import {cvtR2Url,toOssDomain,forceLinksNewTab} from "@/utils/convert.js";
 import {getIconByName} from "@/utils/icon-utils.js";
 import {useSettingStore} from "@/store/setting.js";
 import {allEmailDelete} from "@/request/all-email.js";
@@ -133,7 +143,8 @@ function toMessage(message) {
 function formatImage(content) {
   content = content || '';
   const domain = settingStore.settings.r2Domain;
-  return  content.replace(/{{domain}}/g, toOssDomain(domain) + '/');
+  content = content.replace(/{{domain}}/g, toOssDomain(domain) + '/');
+  return forceLinksNewTab(content);
 }
 
 function showImage(key) {
@@ -235,6 +246,22 @@ const handleDelete = () => {
   }
   .icon {
     cursor: pointer;
+  }
+
+  @media (max-width: 767px) {
+    gap: 4px;
+
+    .icon {
+      padding: 11px;
+      margin: -11px;
+      border-radius: 50%;
+    }
+
+    .star {
+      padding: 11px;
+      margin: -11px;
+      min-width: 0;
+    }
   }
 }
 
@@ -338,6 +365,42 @@ const handleDelete = () => {
             display: flex;
           }
         }
+      }
+    }
+
+    .reply-bar {
+      display: flex;
+      gap: 12px;
+      margin-top: 8px;
+      margin-bottom: 30px;
+
+      .reply-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 22px;
+        border: 1px solid var(--light-border);
+        border-radius: 24px;
+        background: var(--el-bg-color);
+        color: var(--el-text-color-primary);
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 140ms ease, border-color 140ms ease, box-shadow 140ms ease;
+
+        &:hover {
+          background: var(--el-color-primary-light-9);
+          border-color: var(--el-color-primary-light-7);
+          box-shadow: 0 1px 4px rgba(6, 59, 58, 0.1);
+        }
+
+        &:active {
+          background: var(--el-color-primary-light-8);
+        }
+      }
+
+      .forward-btn {
+        color: var(--secondary-text-color);
       }
     }
 
