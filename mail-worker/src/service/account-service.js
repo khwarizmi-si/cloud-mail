@@ -103,6 +103,27 @@ const accountService = {
 		return orm(c).select().from(account).where(sql`${account.email} COLLATE NOCASE = ${email}`).get();
 	},
 
+	async restore(c, accountId) {
+
+		const accountRow = await orm(c).select().from(account).where(eq(account.accountId, accountId)).get();
+
+		if (!accountRow) {
+			throw new BizError(t('noUserAccount'));
+		}
+
+		if (accountRow.isDel !== isDel.DELETE) {
+			return;
+		}
+
+		const existing = await this.selectByEmailIncludeDel(c, accountRow.email);
+
+		if (existing && existing.accountId !== accountRow.accountId && existing.isDel === isDel.NORMAL) {
+			throw new BizError(t('isRegAccount'));
+		}
+
+		await orm(c).update(account).set({ isDel: isDel.NORMAL }).where(eq(account.accountId, accountId)).run();
+	},
+
 	list(c, params, userId) {
 
 		let { accountId, size, lastSort } = params;

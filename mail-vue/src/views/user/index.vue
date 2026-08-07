@@ -206,7 +206,11 @@
               <el-button type="primary" size="small">{{t('action')}}</el-button>
               <template #dropdown>
                 <el-dropdown-menu>
-                  <el-dropdown-item @click="deleteAccount(props.row)">{{ $t('delete') }}</el-dropdown-item>
+                  <template v-if="props.row.isDel === 1">
+                    <el-dropdown-item v-perm="'account:restore'" @click="restoreAccount(props.row)">{{ $t('restore') }}</el-dropdown-item>
+                    <el-dropdown-item @click="deleteAccount(props.row)">{{ $t('deletePermanently') }}</el-dropdown-item>
+                  </template>
+                  <el-dropdown-item v-else @click="deleteAccount(props.row)">{{ $t('delete') }}</el-dropdown-item>
                 </el-dropdown-menu>
               </template>
             </el-dropdown>
@@ -379,6 +383,7 @@ import {
   userAllAccount
 } from '@/request/user.js'
 import {roleSelectUse} from "@/request/role.js";
+import {accountRestore} from "@/request/account.js";
 import {Icon} from "@iconify/vue";
 import loading from "@/components/loading/index.vue";
 import {tzDayjs} from "@/utils/day.js";
@@ -552,7 +557,10 @@ const handleContextmenu = (row, column, cell, event) => {
 }
 
 function deleteAccount(account) {
-  ElMessageBox.confirm(t('delConfirm', {msg: account.email}), {
+  const confirmMsg = account.isDel === 1
+      ? t('delPermanentlyConfirm', {msg: account.email})
+      : t('delConfirm', {msg: account.email})
+  ElMessageBox.confirm(confirmMsg, {
     confirmButtonText: t('confirm'),
     cancelButtonText: t('cancel'),
     type: 'warning'
@@ -567,6 +575,17 @@ function deleteAccount(account) {
     })
   });
 }
+function restoreAccount(account) {
+  accountRestore(account.accountId).then(() => {
+    getAccountList()
+    ElMessage({
+      message: t('setSuccess'),
+      type: "success",
+      plain: true
+    })
+  })
+}
+
 function accountCurChange(e) {
   accountParams.num = e
   getAccountList()

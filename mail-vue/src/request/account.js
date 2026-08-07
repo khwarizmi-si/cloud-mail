@@ -27,3 +27,7 @@ export function accountSetAllReceive(accountId) {
 export function accountSetAsTop(accountId) {
     return http.put('/account/setAsTop', {accountId})
 }
+
+export function accountRestore(accountId) {
+    return http.put('/account/restore', {accountId})
+}

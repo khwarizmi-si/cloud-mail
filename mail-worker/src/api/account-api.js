@@ -37,3 +37,9 @@ app.put('/account/setAsTop', async (c) => {
 	await accountService.setAsTop(c, await c.req.json(), userContext.getUserId(c));
 	return c.json(result.ok());
 });
+
+app.put('/account/restore', async (c) => {
+	const { accountId } = await c.req.json();
+	await accountService.restore(c, accountId);
+	return c.json(result.ok());
+});

@@ -69,6 +69,8 @@ const zh = {
     banned: '封禁',
     reset: '重置',
     restore: '恢复',
+    deletePermanently: '永久删除',
+    delPermanentlyConfirm: '永久删除 {msg}？该邮箱可立即重新使用，但此操作无法撤销。',
     tabSetting: '设置',
     registrationIp: '注册IP',
     recentIP: '近期IP',

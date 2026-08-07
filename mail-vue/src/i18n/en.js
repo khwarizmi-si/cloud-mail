@@ -69,6 +69,8 @@ const en = {
     banned: 'Banned',
     reset: 'Reset',
     restore: 'Restore',
+    deletePermanently: 'Delete Permanently',
+    delPermanentlyConfirm: 'Permanently delete {msg}? This email becomes reusable immediately, but the action cannot be undone.',
     tabSetting: 'Settings',
     registrationIp: 'Registration IP',
     recentIP: 'Recent IP',
