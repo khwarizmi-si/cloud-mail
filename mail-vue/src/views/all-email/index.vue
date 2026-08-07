@@ -121,15 +121,26 @@ const mySelect = ref()
 const showBathDelete = ref(false)
 const clearLoading = ref(false)
 
+function applyGlobalQuery(q) {
+  const globalQuery = typeof q === 'string' ? q.trim() : ''
+  if (!globalQuery) return
+
+  searchValue.value = ''
+  params.userEmail = null
+  params.accountEmail = null
+  params.name = null
+  params.subject = null
+  params.keyword = globalQuery
+
+  sysEmailScroll.value.refreshList();
+}
+
 onMounted(() => {
-  const globalQuery = typeof route.query.q === 'string' ? route.query.q.trim() : ''
-  if (globalQuery) {
-    searchValue.value = globalQuery
-    params.searchType = 'subject'
-    search()
-  }
+  applyGlobalQuery(route.query.q)
   latest();
 })
+
+watch(() => route.query.q, applyGlobalQuery)
 
 const openSelect = () => {
   mySelect.value.toggleMenu()
@@ -142,6 +153,7 @@ const params = reactive({
   accountEmail: null,
   name: null,
   subject: null,
+  keyword: null,
   searchType: 'name'
 })
 
@@ -247,6 +259,7 @@ function refreshBefore() {
   params.accountEmail = null
   params.name = null
   params.subject = null
+  params.keyword = null
   params.searchType = 'name'
 }
 
@@ -256,6 +269,7 @@ function search() {
   params.accountEmail = null
   params.name = null
   params.subject = null
+  params.keyword = null
 
   if (params.searchType === 'user') {
     params.userEmail = searchValue.value

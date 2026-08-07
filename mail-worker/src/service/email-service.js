@@ -771,7 +771,7 @@ const emailService = {
 
 	async allList(c, params) {
 
-		let { emailId, size, name, subject, accountEmail, userEmail, type, timeSort } = params;
+		let { emailId, size, name, subject, accountEmail, userEmail, keyword, type, timeSort } = params;
 
 		size = Number(size);
 
@@ -829,6 +829,18 @@ const emailService = {
 
 		if (subject) {
 			conditions.push(sql`${email.subject} COLLATE NOCASE LIKE ${'%'+ subject + '%'}`);
+		}
+
+		if (keyword) {
+			conditions.push(
+				or(
+					sql`${email.name} COLLATE NOCASE LIKE ${'%'+ keyword + '%'}`,
+					sql`${email.subject} COLLATE NOCASE LIKE ${'%'+ keyword + '%'}`,
+					sql`${user.email} COLLATE NOCASE LIKE ${'%'+ keyword + '%'}`,
+					sql`${email.toEmail} COLLATE NOCASE LIKE ${'%'+ keyword + '%'}`,
+					sql`${email.sendEmail} COLLATE NOCASE LIKE ${'%'+ keyword + '%'}`,
+				)
+			);
 		}
 
 		conditions.push(ne(email.status, emailConst.status.SAVING));
