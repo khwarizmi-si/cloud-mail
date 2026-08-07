@@ -27,6 +27,14 @@ export function cvtR2Url(key) {
     return domain + '/' + key
 }
 
+export function forceLinksNewTab(html) {
+    if (!html) return html;
+    return html.replace(/<a\b((?:(?!<\/?a\b)[\s\S])*?)>/gi, (match, attrs) => {
+        if (/\btarget\s*=/i.test(attrs)) return match;
+        return `<a${attrs} target="_blank" rel="noopener noreferrer">`;
+    });
+}
+
 export function toOssDomain(domain) {
 
     if (!domain) {

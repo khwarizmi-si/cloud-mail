@@ -2,7 +2,7 @@
   <iframe
     class="content-html"
     :srcdoc="html"
-    sandbox
+    sandbox="allow-popups allow-popups-to-escape-sandbox allow-top-navigation-by-user-activation"
     referrerpolicy="no-referrer"
     title="Email content"
   ></iframe>
