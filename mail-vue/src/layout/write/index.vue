@@ -1,7 +1,7 @@
 <template>
   <div class="send" v-show="show">
-    <div class="write-box">
-      <div class="title">
+    <div class="write-box" :class="{ minimized }">
+      <div class="title" @click="minimized && toggleMinimize()">
         <div class="title-left">
           <span class="title-text">
             <Icon icon="hugeicons:quill-write-01" width="28" height="28"/>
@@ -9,12 +9,18 @@
           <span class="sender">{{ $t('sender') }}:</span>
           <span class="sender-name">{{ form.name }}</span>
           <span class="send-email"><{{ form.sendEmail }}></span>
+          <span class="draft-subject" v-if="minimized">{{ form.subject || $t('subject') }}</span>
         </div>
-        <div @click="close" style="cursor: pointer;">
-          <Icon icon="material-symbols-light:close-rounded" width="22" height="22"/>
+        <div class="title-actions">
+          <div @click.stop="toggleMinimize" class="title-action-btn minimize-btn" :aria-label="minimized ? $t('expand') : $t('collapse')">
+            <Icon :icon="minimized ? 'material-symbols-light:keyboard-arrow-up-rounded' : 'material-symbols-light:keyboard-arrow-down-rounded'" width="24" height="24"/>
+          </div>
+          <div @click.stop="close" class="title-action-btn" :aria-label="$t('close')">
+            <Icon icon="material-symbols-light:close-rounded" width="22" height="22"/>
+          </div>
         </div>
       </div>
-      <div class="container">
+      <div class="container" v-show="!minimized">
         <el-input-tag  @add-tag="addTagChange" tag-type="primary" @input="inputChange" size="default" v-model="form.receiveEmail" >
           <template #prefix>
             <div class="item-title" >{{ $t('recipient') }}</div>
@@ -131,6 +137,7 @@ const accountStore = useAccountStore()
 const editor = ref({})
 const userStore = useUserStore();
 const show = ref(false);
+const minimized = ref(false);
 const percent = ref(0)
 let percentMessage = null
 let sending = false
@@ -516,6 +523,7 @@ function open() {
     form.accountId = accountStore.currentAccount.accountId;
     form.name = accountStore.currentAccount.name;
   }
+  minimized.value = false;
   show.value = true;
   editor.value.focus()
 }
@@ -524,8 +532,13 @@ function openDraft(draft) {
   Object.assign(form, {...draft})
   defValue.value = ''
   setTimeout(() => defValue.value = form.content)
+  minimized.value = false;
   show.value = true;
   editor.value.focus()
+}
+
+function toggleMinimize() {
+  minimized.value = !minimized.value;
 }
 
 const handleKeyDown = (event) => {
@@ -627,15 +640,16 @@ function close() {
   align-items: flex-end;
   justify-content: flex-end;
   padding: 24px 28px;
-  background: rgba(6, 59, 58, 0.12);
+  pointer-events: none;
   z-index: 120;
 
   .write-box {
+    pointer-events: auto;
     background: var(--el-bg-color);
     width: min(640px, calc(100% - 16px));
-    box-shadow: var(--el-box-shadow-light);
+    box-shadow: var(--el-box-shadow-dark, 0 8px 30px rgba(0, 0, 0, 0.28));
     border: 0;
-    transition: var(--el-transition-duration);
+    transition: height 180ms ease, var(--el-transition-duration);
     border-radius: 12px;
     display: grid;
     grid-template-rows: auto 1fr;
@@ -646,10 +660,25 @@ function close() {
       border-radius: 0;
       border: 0;
       padding-top: 10px;
+
+      .minimize-btn {
+        display: none;
+      }
     }
 
     @media (min-width: 1025px) {
       height: min(800px, calc(100vh - 60px));
+    }
+
+    &.minimized {
+      @media (min-width: 1025px) {
+        height: 52px;
+        grid-template-rows: auto;
+      }
+
+      .title {
+        cursor: pointer;
+      }
     }
 
     .title {
@@ -663,7 +692,8 @@ function close() {
       .title-left {
         align-items: center;
         display: grid;
-        grid-template-columns: auto auto auto 1fr;
+        grid-template-columns: auto auto auto auto 1fr;
+        min-width: 0;
       }
 
       .title-text {
@@ -684,6 +714,38 @@ function close() {
         white-space: nowrap;
         text-overflow: ellipsis;
         overflow: hidden;
+      }
+
+      .draft-subject {
+        margin-left: 12px;
+        padding-left: 12px;
+        border-left: 1px solid rgba(255, 255, 255, 0.25);
+        color: #d9d9d9;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        min-width: 0;
+      }
+
+      .title-actions {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .title-action-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 26px;
+        height: 26px;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background 120ms ease;
+
+        &:hover {
+          background: rgba(255, 255, 255, 0.15);
+        }
       }
 
 

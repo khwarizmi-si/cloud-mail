@@ -11,12 +11,15 @@
     <form class="search-box" @submit.prevent="searchAll">
       <Icon class="search-icon" icon="iconoir:search" width="19" height="19" />
       <input
+          id="global-search-input"
+          ref="searchInputRef"
           v-model="searchText"
           type="search"
           :placeholder="$t('searchMail')"
           :aria-label="$t('searchMail')"
           @input="uiStore.searchQuery = searchText"
       />
+      <kbd v-if="!searchText" class="search-shortcut-hint">/</kbd>
       <button v-if="searchText" type="button" class="clear-search" :aria-label="$t('clear')" @click="searchText = ''; uiStore.searchQuery = ''">
         <Icon icon="material-symbols:close" width="18" height="18" />
       </button>
@@ -118,6 +121,9 @@ const logoutLoading = ref(false)
 const userInfoShow = ref(false)
 const userinfoRef = ref({})
 const searchText = ref('')
+const searchInputRef = ref(null)
+
+defineExpose({ focusSearch: () => searchInputRef.value?.focus() })
 
 watch(() => route.query.q, (query) => {
   searchText.value = typeof query === 'string' ? query : ''
@@ -499,20 +505,25 @@ function formatName(email) {
   display: flex;
   align-items: center;
   gap: 10px;
-  width: min(100%, 720px);
-  height: 44px;
+  width: min(100%, 760px);
+  height: 46px;
   margin: 0 auto;
-  padding: 0 13px;
-  border: 1px solid transparent;
-  border-radius: 10px;
+  padding: 0 16px;
+  border: 1px solid var(--light-border);
+  border-radius: 24px;
   background: var(--el-color-primary-light-9);
   color: var(--regular-text-color);
   transition: background 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
 
+  &:hover {
+    background: var(--el-bg-color);
+    box-shadow: 0 1px 4px rgba(6, 59, 58, 0.1);
+  }
+
   &:focus-within {
     background: var(--el-bg-color);
     border-color: var(--el-color-primary-light-7);
-    box-shadow: 0 1px 3px rgba(6, 59, 58, 0.12);
+    box-shadow: 0 1px 6px rgba(6, 59, 58, 0.16);
   }
 
   input {
@@ -520,6 +531,7 @@ function formatName(email) {
     flex: 1;
     color: var(--el-text-color-primary);
     background: transparent;
+    font-size: 15px;
 
     &::placeholder {
       color: var(--secondary-text-color);
@@ -528,6 +540,22 @@ function formatName(email) {
 
   .search-icon {
     flex: 0 0 auto;
+  }
+
+  .search-shortcut-hint {
+    flex: 0 0 auto;
+    font-family: inherit;
+    font-size: 12px;
+    line-height: 1;
+    padding: 4px 7px;
+    border-radius: 6px;
+    border: 1px solid var(--light-border);
+    color: var(--secondary-text-color);
+    background: var(--el-bg-color);
+
+    @media (max-width: 767px) {
+      display: none;
+    }
   }
 
   .clear-search {
@@ -613,11 +641,21 @@ function formatName(email) {
   }
 
   .toolbar {
-    gap: 2px;
+    gap: 4px;
     grid-column: 1 / -1;
     justify-content: flex-end;
     position: absolute;
     right: 8px;
+
+    .icon-item {
+      width: 40px;
+      height: 40px;
+    }
+
+    .avatar .avatar-text {
+      width: 40px;
+      height: 40px;
+    }
     top: 12px;
     pointer-events: none;
 

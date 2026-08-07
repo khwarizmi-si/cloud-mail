@@ -109,6 +109,14 @@
               </div>
               <div class="email-right" :style="showUserInfo ? 'align-self: start;':''">
                 <span class="email-time" :style="(item.unread === EmailUnreadEnum.UNREAD && showUnread) ? 'font-weight: bold' : ''">{{ item.formatCreateTime }}</span>
+                <div class="row-actions" v-if="type !== 'draft'" @click.stop>
+                  <el-tooltip v-if="type === 'email' && showUnread && item.unread === EmailUnreadEnum.UNREAD" effect="dark" :content="t('markAsRead')">
+                    <Icon class="row-action-icon" icon="fluent:mail-read-20-regular" width="18" height="18" @click="emailRead(item.emailId)"/>
+                  </el-tooltip>
+                  <el-tooltip effect="dark" :content="t('delete')">
+                    <Icon class="row-action-icon" icon="uiw:delete" width="16" height="18" @click="rightDelete(item.emailId)"/>
+                  </el-tooltip>
+                </div>
               </div>
             </div>
             <skeletonBlock v-else-if="item.expand === 'loading'"
@@ -1231,8 +1239,38 @@ function loadData() {
     display: flex;
     padding-left: 15px;
     align-items: center;
+    position: relative;
+    min-width: 60px;
+    justify-content: flex-end;
     @media (max-width: 1366px) {
       display: none;
+    }
+
+    .row-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      position: absolute;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      background: inherit;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.12s ease-in-out;
+
+      .row-action-icon {
+        cursor: pointer;
+        padding: 5px;
+        border-radius: 6px;
+        color: var(--secondary-text-color);
+        transition: background 0.12s ease, color 0.12s ease;
+
+        &:hover {
+          background: var(--el-color-primary-light-8);
+          color: var(--el-color-primary);
+        }
+      }
     }
   }
 
@@ -1245,6 +1283,15 @@ function loadData() {
   &:hover {
     background-color: var(--email-hover-background);
     z-index: 0;
+
+    .email-right .email-time {
+      opacity: 0;
+    }
+
+    .email-right .row-actions {
+      opacity: 1;
+      pointer-events: auto;
+    }
   }
 
   &.is-unread {
@@ -1283,6 +1330,7 @@ function loadData() {
 
 .email-time {
   padding-right: v-bind(timePaddingRight);
+  transition: opacity 0.12s ease-in-out;
 }
 
 :deep(.el-scrollbar__view) {
