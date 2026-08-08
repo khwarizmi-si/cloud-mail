@@ -1,7 +1,13 @@
 # pnpm 10+ reads settings from here, not from the "pnpm" field in package.json.
 # workerd ships its runtime binary via a postinstall script, so wrangler cannot build
 # or deploy without it. Unapproved build scripts also make `pnpm install` exit
-# non-zero, which fails the build on a clean checkout (Cloudflare Workers Builds, CI).
+# non-zero on pnpm 10+, which fails the build on a clean checkout.
+#
+# `packages` is required by pnpm 9 (used by the GitHub Actions workflow), which
+# refuses to install against a workspace file without it.
+packages:
+  - .
+
 allowBuilds:
   esbuild: true
   sharp: true
