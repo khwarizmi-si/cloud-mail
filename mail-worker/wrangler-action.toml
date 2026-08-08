@@ -50,4 +50,5 @@ linuxdo_callback_url = "${LINUXDO_CALLBACK_URL}"
 linuxdo_switch = "${LINUXDO_SWITCH}"
 
 [build]
-command = "cd ../mail-vue && ./node_modules/.bin/vite build --mode release && ! grep -q '/src/main.js' ../mail-worker/dist/index.html"
+# See wrangler.toml for why deps are installed conditionally and why test -f is needed.
+command = "cd ../mail-vue && { [ -x node_modules/.bin/vite ] || corepack pnpm install --frozen-lockfile; } && node_modules/.bin/vite build --mode release && test -f ../mail-worker/dist/index.html && ! grep -q '/src/main.js' ../mail-worker/dist/index.html"

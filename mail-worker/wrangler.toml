@@ -51,4 +51,9 @@ domain = ["khwarizmi.co.id"]
 admin = "admin@khwarizmi.co.id"
 
 [build]
-command = "cd ../mail-vue && ./node_modules/.bin/vite build --mode release && ! grep -q '/src/main.js' ../mail-worker/dist/index.html"
+# Installs deps only when they are missing, so this works both locally (node_modules
+# already present, pnpm may not even be installed) and on a clean checkout such as
+# Cloudflare Workers Builds. corepack ships with Node, so pnpm need not be global.
+# The test -f guard matters: without it a missing index.html makes grep exit 2, which
+# the leading ! flips to success, letting a failed build deploy.
+command = "cd ../mail-vue && { [ -x node_modules/.bin/vite ] || corepack pnpm install --frozen-lockfile; } && node_modules/.bin/vite build --mode release && test -f ../mail-worker/dist/index.html && ! grep -q '/src/main.js' ../mail-worker/dist/index.html"

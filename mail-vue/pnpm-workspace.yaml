@@ -1,0 +1,7 @@
+# pnpm 10+ reads settings from here, not from the "pnpm" field in package.json.
+# Without this, `pnpm install` exits non-zero with ERR_PNPM_IGNORED_BUILDS on a clean
+# checkout, which breaks the wrangler [build] command and therefore production deploys.
+allowBuilds:
+  '@parcel/watcher': true
+  esbuild: true
+  vue-demi: true
